@@ -225,6 +225,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--slate-100);color:va
 .conn-status.waiting{background:var(--amber-50);border-color:#FDE68A;color:var(--amber-600)}
 .conn-status.error{background:var(--red-50);border-color:#FECACA;color:var(--red-600)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -233,11 +234,17 @@ code{font-family:var(--mono);font-size:12px;background:var(--slate-100);color:va
   <div class="lc">
     <div class="lb"><div class="li">AI</div><div class="ln">Agents Intelligence <small>MANAGEMENT PORTAL</small></div></div>
     <div class="lsep"></div>
+
     <label class="fl">URL da API <span class="req">*</span></label>
     <input class="fi im" id="i-url" type="text" value="http://localhost:3000" placeholder="http://localhost:3000 ou https://xxx.railway.app">
     <p class="fh">Em produção use a URL do Railway</p>
-    <label class="fl">Chave de acesso (ADMIN_SECRET) <span class="req">*</span></label>
-    <input class="fi" id="i-sec" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+
+    <label class="fl">Email <span class="req">*</span></label>
+    <input class="fi" id="i-email" type="email" placeholder="seu@email.com">
+
+    <label class="fl">Senha <span class="req">*</span></label>
+    <input class="fi" id="i-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+
     <button class="lbtn" onclick="doLogin()">Acessar painel →</button>
     <div id="lerr" class="lerr">Credenciais inválidas ou API inacessível.</div>
   </div>
@@ -458,36 +465,41 @@ code{font-family:var(--mono);font-size:12px;background:var(--slate-100);color:va
 <div id="toast"></div>
 
 <script>
+  const supabaseClient = window.supabase.createClient(
+  'https://cnmqxtdofxocyfpcvpvq.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNubXF4dGRvZnhvY3lmcGN2cHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTM5ODgsImV4cCI6MjA5MjI4OTk4OH0.noO-EE6GvE68AMVnz0Ksaf_RLAArvU9wrpOYOoFa2Wk'
+)
+
+let TOKEN = null
 let API='',SECRET='',lojaAtiva=null,todasLojas=[],editLojaId=null,contatoAtivo=null,pgAtual='dashboard'
 
-async function apiFetch(url, options = {}) {
-  return fetch(url, {
-    ...options,
-    headers: {
-      'x-admin-secret': SECRET,
-      ...(options.headers || {})
-    }
-  })
-}
-  
 async function doLogin(){
-  API=document.getElementById('i-url').value.trim().replace(/\/$/,'')
-  SECRET=document.getElementById('i-sec').value.trim()
-  try{
-    const r=await fetch(`${API}/status`)
-    if(!r.ok) throw new Error()
-    document.getElementById('sl').style.display='none'
-    document.getElementById('sa').style.display='block'
-    await loadLojas()
-    pollStatus()
-    setInterval(pollStatus,12000)
-    loadDashboard()
-  }catch{document.getElementById('lerr').style.display='block'}
+  const email = document.getElementById('i-email').value
+  const password = document.getElementById('i-pass').value
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  })
+
+  if(error){
+    alert(error.message)
+    return
+  }
+
+  TOKEN = data.session.access_token
+
+  API = document.getElementById('i-url').value.trim().replace(/\/$/,'')
+
+  document.getElementById('sl').style.display='none'
+  document.getElementById('sa').style.display='block'
+
+  await loadLojas()
 }
 function doLogout(){API=SECRET='';lojaAtiva=null;document.getElementById('sa').style.display='none';document.getElementById('sl').style.display='flex'}
 
 async function rq(path,method='GET',body=null){
-  const opts={method,headers:{'Content-Type':'application/json','x-admin-secret':SECRET}}
+  const opts={method,headers:{'Content-Type':'application/json','Authorization': 'Bearer ' + TOKEN}}
   if(body) opts.body=JSON.stringify(body)
   const r=await fetch(API+path,opts)
   if(!r.ok) throw new Error(await r.text())
