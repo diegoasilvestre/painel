@@ -463,398 +463,554 @@ code{font-family:var(--mono);font-size:12px;background:var(--slate-100);color:va
 <div id="toast"></div>
 
 <script>
-  const supabaseClient = window.supabase.createClient(
+// ── Supabase client ──────────────────────────────────────────────────────────
+const supabaseClient = window.supabase.createClient(
   'https://cnmqxtdofxocyfpcvpvq.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNubXF4dGRvZnhvY3lmcGN2cHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTM5ODgsImV4cCI6MjA5MjI4OTk4OH0.noO-EE6GvE68AMVnz0Ksaf_RLAArvU9wrpOYOoFa2Wk'
 )
 
-let TOKEN = null
-let API='',SECRET='',lojaAtiva=null,todasLojas=[],editLojaId=null,contatoAtivo=null,pgAtual='dashboard'
+// ── Estado global ────────────────────────────────────────────────────────────
+let API = ''
+let lojaAtiva = null
+let todasLojas = []
+let editLojaId = null
+let contatoAtivo = null
+let pgAtual = 'dashboard'
 
-async function doLogin(){
-  const email = document.getElementById('i-email').value
+// ── Auth ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email    = document.getElementById('i-email').value.trim()
   const password = document.getElementById('i-pass').value
+  const apiUrl   = document.getElementById('i-url').value.trim().replace(/\/$/, '')
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  })
-
-  if(error){
-    alert(error.message)
+  if (!email || !password || !apiUrl) {
+    document.getElementById('lerr').style.display = 'block'
+    document.getElementById('lerr').textContent = 'Preencha todos os campos.'
     return
   }
 
-  // salva token
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password })
+
+  if (error) {
+    document.getElementById('lerr').style.display = 'block'
+    document.getElementById('lerr').textContent = 'Login inválido: ' + error.message
+    return
+  }
+
   localStorage.setItem('token', data.session.access_token)
-  TOKEN = data.session.access_token
+  API = apiUrl
 
-  // salva API
-  API = document.getElementById('i-url').value.trim().replace(/\/$/,'')
+  document.getElementById('lerr').style.display = 'none'
+  document.getElementById('sl').style.display = 'none'
+  document.getElementById('sa').style.display = 'block'
 
-  // troca tela
-  document.getElementById('sl').style.display='none'
-  document.getElementById('sa').style.display='block'
-
-  // carrega dados
   await loadLojas()
+  pollStatus()
+  setInterval(pollStatus, 12000)
+  loadDashboard()
 }
 
-async function doLogout(){
+async function doLogout() {
+  localStorage.removeItem('token')
   API = ''
   lojaAtiva = null
-
-  // remove token
-  localStorage.removeItem('token')
-
-  // logout supabase
-  try {
-    await supabaseClient.auth.signOut()
-  } catch(e){
-    console.warn(e.message)
-  }
-
-  // volta tela login
-  document.getElementById('sa').style.display='none'
-  document.getElementById('sl').style.display='flex'
+  try { await supabaseClient.auth.signOut() } catch(e) { /* silencia */ }
+  document.getElementById('sa').style.display = 'none'
+  document.getElementById('sl').style.display = 'flex'
 }
 
-async function rq(path, method = 'GET', body = null) {
+// ── HTTP helper — assinatura correta: rq(path, method, body) ─────────────────
+async function rq(path, method, body) {
+  method = method || 'GET'
   const token = localStorage.getItem('token')
   const opts = {
-    method,
+    method: method,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: 'Bearer ' + token })
     }
   }
-  if (body) opts.body = JSON.stringify(body)
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token
+  if (body)  opts.body = JSON.stringify(body)
 
   const res = await fetch(API + path, opts)
   if (!res.ok) {
     const err = await res.text()
-    console.error('ERRO BACKEND:', res.status, err)
+    console.error('[' + method + '] ' + path + ' → ' + res.status + ':', err)
     throw new Error(err)
   }
   return res.json()
 }
 
-  if (!res.ok) {
-    const err = await res.text()
-    console.error('ERRO BACKEND:', err)
-    throw new Error(err)
+// ── Status WhatsApp ──────────────────────────────────────────────────────────
+async function pollStatus() {
+  try {
+    const s = await fetch(API + '/status').then(r => r.json())
+    const ok = s.whatsapp === 'conectado'
+    const dot = document.getElementById('sdot')
+    if (ok) {
+      dot.classList.add('online')
+      document.getElementById('slbl').textContent = 'WhatsApp online'
+      document.getElementById('snum').textContent = s.numero || ''
+    } else {
+      dot.classList.remove('online')
+      document.getElementById('slbl').textContent = 'Aguardando conexão'
+      document.getElementById('snum').textContent = ''
+    }
+    const sw = document.getElementById('s-wa')
+    if (sw) { sw.textContent = ok ? 'Online' : 'Offline'; sw.style.color = ok ? 'var(--green-600)' : 'var(--amber-600)' }
+    const swn = document.getElementById('s-wa-n')
+    if (swn) swn.textContent = ok ? (s.numero || '') : '—'
+  } catch {
+    document.getElementById('sdot').classList.remove('online')
+    document.getElementById('slbl').textContent = 'API inacessível'
+    document.getElementById('snum').textContent = ''
   }
-  return res.json()
-}
-async function pollStatus(){
-  try{
-    const s=await fetch(`${API}/status`).then(r=>r.json())
-    const ok=s.whatsapp==='conectado'
-    const dot=document.getElementById('sdot')
-    if(ok){dot.classList.add('online');document.getElementById('slbl').textContent='WhatsApp online';document.getElementById('snum').textContent=s.numero||''}
-    else{dot.classList.remove('online');document.getElementById('slbl').textContent='Aguardando QR';document.getElementById('snum').textContent=''}
-    const sw=document.getElementById('s-wa')
-    if(sw){sw.textContent=ok?'Online':'Offline';sw.style.color=ok?'var(--green-600)':'var(--amber-600)'}
-    if(document.getElementById('s-wa-n')) document.getElementById('s-wa-n').textContent=ok?s.numero||'':'—'
-  }catch{document.getElementById('sdot').classList.remove('online');document.getElementById('slbl').textContent='API inacessível'}
-}
-function gp(name,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'))
-  document.getElementById(`page-${name}`).classList.add('active')
-  if(el) el.classList.add('active')
-  pgAtual=name
-  document.getElementById('tp-page').textContent=el?el.textContent.trim():name
-  if(name==='dashboard') loadDashboard()
-  if(name==='agente') loadAgenteForm()
-  if(name==='produtos') loadProdutos()
-  if(name==='pedidos') loadPedidos()
-  if(name==='conversas') loadContatos()
-  if(name==='clientes') loadLojasTab()
-  if(name==='conexao') checkConnStatus()
-}
-function refreshPage(){
-  if(pgAtual==='dashboard') loadDashboard()
-  if(pgAtual==='agente') loadAgenteForm()
-  if(pgAtual==='produtos') loadProdutos()
-  if(pgAtual==='pedidos') loadPedidos()
-  if(pgAtual==='conversas') loadContatos()
-  if(pgAtual==='clientes') loadLojasTab()
-  if(pgAtual==='conexao') checkConnStatus()
 }
 
-async function loadLojas(){
-  todasLojas=await rq('/admin/lojas')
-  const sel=document.getElementById('sel-loja')
-  sel.innerHTML=todasLojas.length?todasLojas.map(l=>`<option value="${l.id}">${e(l.nome)}</option>`).join(''):'<option>Nenhum cliente</option>'
-  if(todasLojas.length){lojaAtiva=todasLojas[0];document.getElementById('tp-loja').textContent=lojaAtiva.nome}
+// ── Navegação ────────────────────────────────────────────────────────────────
+function gp(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'))
+  document.getElementById('page-' + name).classList.add('active')
+  if (el) el.classList.add('active')
+  pgAtual = name
+  document.getElementById('tp-page').textContent = el ? el.textContent.trim() : name
+  if (name === 'dashboard') loadDashboard()
+  if (name === 'agente')    loadAgenteForm()
+  if (name === 'produtos')  loadProdutos()
+  if (name === 'pedidos')   loadPedidos()
+  if (name === 'conversas') loadContatos()
+  if (name === 'clientes')  loadLojasTab()
+  if (name === 'conexao')   checkConnStatus()
 }
-function onTrocar(){
-  const id=document.getElementById('sel-loja').value
-  lojaAtiva=todasLojas.find(l=>l.id===id)||null
-  document.getElementById('tp-loja').textContent=lojaAtiva?.nome||''
+
+function refreshPage() {
+  if (pgAtual === 'dashboard') loadDashboard()
+  if (pgAtual === 'agente')    loadAgenteForm()
+  if (pgAtual === 'produtos')  loadProdutos()
+  if (pgAtual === 'pedidos')   loadPedidos()
+  if (pgAtual === 'conversas') loadContatos()
+  if (pgAtual === 'clientes')  loadLojasTab()
+  if (pgAtual === 'conexao')   checkConnStatus()
+}
+
+// ── Lojas / Clientes ─────────────────────────────────────────────────────────
+async function loadLojas() {
+  todasLojas = await rq('/admin/lojas')
+  const sel = document.getElementById('sel-loja')
+  sel.innerHTML = todasLojas.length
+    ? todasLojas.map(l => '<option value="' + l.id + '">' + e(l.nome) + '</option>').join('')
+    : '<option>Nenhum cliente cadastrado</option>'
+  if (todasLojas.length) {
+    lojaAtiva = todasLojas[0]
+    document.getElementById('tp-loja').textContent = lojaAtiva.nome
+  }
+}
+
+function onTrocar() {
+  const id = document.getElementById('sel-loja').value
+  lojaAtiva = todasLojas.find(l => l.id === id) || null
+  document.getElementById('tp-loja').textContent = lojaAtiva ? lojaAtiva.nome : ''
   refreshPage()
 }
-async function loadLojasTab(){
-  if(!todasLojas.length) todasLojas=await rq('/admin/lojas')
-  const tbody=document.getElementById('ltb')
-  if(!todasLojas.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty"><div class="ei">⊞</div><div class="etit">Nenhum cliente</div></div></td></tr>`;return}
-  tbody.innerHTML=todasLojas.map(l=>`<tr><td><strong>${e(l.nome)}</strong></td><td class="tm">${e(l.wa_id)}</td><td>${l.ativa?'<span class="badge b-gn"><span class="bdot"></span>Ativo</span>':'<span class="badge b-sl">Inativo</span>'}</td><td><div class="btn-grp"><button class="btn btn-o btn-xs" onclick="editLoja('${l.id}')">Editar</button><button class="btn btn-g btn-xs" onclick="togLoja('${l.id}',${!l.ativa})">${l.ativa?'Desativar':'Ativar'}</button></div></td></tr>`).join('')
+
+async function loadLojasTab() {
+  if (!todasLojas.length) todasLojas = await rq('/admin/lojas')
+  const tbody = document.getElementById('ltb')
+  if (!todasLojas.length) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="ei">⊞</div><div class="etit">Nenhum cliente</div></div></td></tr>'
+    return
+  }
+  tbody.innerHTML = todasLojas.map(l =>
+    '<tr>' +
+    '<td><strong>' + e(l.nome) + '</strong></td>' +
+    '<td class="tm">' + e(l.wa_id) + '</td>' +
+    '<td>' + (l.ativa ? '<span class="badge b-gn"><span class="bdot"></span>Ativo</span>' : '<span class="badge b-sl">Inativo</span>') + '</td>' +
+    '<td><div class="btn-grp">' +
+      '<button class="btn btn-o btn-xs" onclick="editLoja(\'' + l.id + '\')">Editar</button>' +
+      '<button class="btn btn-g btn-xs" onclick="togLoja(\'' + l.id + '\',' + !l.ativa + ')">' + (l.ativa ? 'Desativar' : 'Ativar') + '</button>' +
+    '</div></td></tr>'
+  ).join('')
 }
-function openMo(id){document.getElementById(id).classList.add('open')}
-function closeMo(id){
+
+function openMo(id) { document.getElementById(id).classList.add('open') }
+function closeMo(id) {
   document.getElementById(id).classList.remove('open')
-  editLojaId=null
-  document.getElementById('mlt').textContent='Novo cliente'
-  document.getElementById('bsl').textContent='Criar cliente'
-  document.getElementById('bsl').onclick=saveLoja
+  editLojaId = null
+  document.getElementById('mlt').textContent = 'Novo cliente'
+  document.getElementById('bsl').textContent = 'Criar cliente'
+  document.getElementById('bsl').onclick = saveLoja
 }
-async function saveLoja(){
-  const nome=document.getElementById('lno').value.trim()
-  const wa_id=document.getElementById('lwa').value.replace(/\D/g,'')
-  const prompt_base=document.getElementById('lpr').value.trim()
-  if(!nome||!wa_id){toast('Nome e número obrigatórios','error');return}
-  try{
-    if(editLojaId) await rq(`/admin/lojas/${editLojaId}`,'PATCH',{nome,prompt_base})
-    else await rq('/admin/lojas','POST',{nome,wa_id,prompt_base,ativa:true})
-    closeMo('ml');await loadLojas();loadLojasTab()
-    toast(editLojaId?'Cliente atualizado':'Cliente criado','success')
-  }catch(err){toast('Erro: '+err.message,'error')}
+
+async function saveLoja() {
+  const nome        = document.getElementById('lno').value.trim()
+  const wa_id       = document.getElementById('lwa').value.replace(/\D/g, '')
+  const prompt_base = document.getElementById('lpr').value.trim()
+  if (!nome || !wa_id) { toast('Nome e número obrigatórios', 'error'); return }
+  try {
+    if (editLojaId) await rq('/admin/lojas/' + editLojaId, 'PATCH', { nome, prompt_base })
+    else            await rq('/admin/lojas', 'POST', { nome, wa_id, prompt_base, ativa: true })
+    closeMo('ml')
+    await loadLojas()
+    loadLojasTab()
+    toast(editLojaId ? 'Cliente atualizado' : 'Cliente criado', 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
 }
-async function editLoja(id){
-  const l=todasLojas.find(x=>x.id===id);if(!l) return
-  editLojaId=id
-  document.getElementById('lno').value=l.nome
-  document.getElementById('lwa').value=l.wa_id
-  document.getElementById('lpr').value=l.prompt_base||''
-  document.getElementById('mlt').textContent='Editar cliente'
-  document.getElementById('bsl').textContent='Salvar'
+
+async function editLoja(id) {
+  const l = todasLojas.find(x => x.id === id)
+  if (!l) return
+  editLojaId = id
+  document.getElementById('lno').value = l.nome
+  document.getElementById('lwa').value = l.wa_id
+  document.getElementById('lpr').value = l.prompt_base || ''
+  document.getElementById('mlt').textContent = 'Editar cliente'
+  document.getElementById('bsl').textContent = 'Salvar'
   openMo('ml')
 }
-async function togLoja(id,ativa){
-  await rq(`/admin/lojas/${id}`,'PATCH',{ativa})
-  await loadLojas();loadLojasTab()
-  toast(ativa?'Cliente ativado':'Cliente desativado','success')
+
+async function togLoja(id, ativa) {
+  await rq('/admin/lojas/' + id, 'PATCH', { ativa })
+  await loadLojas()
+  loadLojasTab()
+  toast(ativa ? 'Cliente ativado' : 'Cliente desativado', 'success')
 }
 
-async function loadDashboard(){
-  if(!lojaAtiva) return
-  document.getElementById('dash-title').textContent=`Dashboard — ${lojaAtiva.nome}`
-  try{
-    const ch=await rq(`/admin/conversas/${lojaAtiva.id}/stats/hoje`).catch(()=>({total:'?'}))
-    document.getElementById('s-conv').textContent=ch.total??'—'
-    const[prods,peds]=await Promise.all([rq(`/admin/produtos?loja_id=${lojaAtiva.id}`),rq(`/admin/pedidos?loja_id=${lojaAtiva.id}`)])
-    document.getElementById('s-prod').textContent=prods.filter(p=>p.ativo!==false).length
-    document.getElementById('s-ped').textContent=peds.filter(p=>p.status==='Pendente').length
-    const tbody=document.getElementById('dp-tbody')
-    const lt=peds.slice(0,5)
-    if(!lt.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="ei">◎</div><div class="etit">Nenhum pedido</div></div></td></tr>`;return}
-    const cls={Pendente:'am',Confirmado:'gn',Entregue:'bl',Cancelado:'rd'}
-    tbody.innerHTML=lt.map(p=>{
-      const its=piItens(p.itens).map(i=>`${i.qty||1}× ${i.nome||'?'}`).join(', ')||'—'
-      const c=cls[p.status]||'sl'
-      return`<tr><td><strong>${e(p.nome_cliente||'—')}</strong><br><span class="tmu">${e(p.numero_cliente)}</span></td><td style="font-size:12px;max-width:180px">${e(its)}</td><td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ${fR(p.total)}</strong></td><td><span class="badge b-${c}">${p.status}</span></td><td class="tmu">${fD(p.created_at)}</td></tr>`
-    }).join('')
-  }catch(err){console.error('Dashboard:',err)}
-}
+// ── Dashboard ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  if (!lojaAtiva) return
+  document.getElementById('dash-title').textContent = 'Dashboard — ' + lojaAtiva.nome
+  try {
+    const ch = await rq('/admin/conversas/' + lojaAtiva.id + '/stats/hoje').catch(() => ({ total: '?' }))
+    document.getElementById('s-conv').textContent = ch.total != null ? ch.total : '—'
 
-function loadAgenteForm(){
-  if(!lojaAtiva) return
-  document.getElementById('a-p').value=lojaAtiva.prompt_base||''
-  document.getElementById('a-i').value=lojaAtiva.instrucoes_extras||''
-  cc('a-p','cc-p');cc('a-i','cc-i')
-}
-async function salvarAgente(){
-  if(!lojaAtiva){toast('Selecione um cliente','error');return}
-  const pb=document.getElementById('a-p').value,ie=document.getElementById('a-i').value
-  try{
-    await rq(`/admin/lojas/${lojaAtiva.id}`,'PATCH',{prompt_base:pb,instrucoes_extras:ie})
-    lojaAtiva.prompt_base=pb;lojaAtiva.instrucoes_extras=ie
-    toast('Salvo — efeito na próxima mensagem','success')
-  }catch(err){toast('Erro: '+err.message,'error')}
-}
-function addChip(fid,t){
-  const el=document.getElementById(fid);const s=el.value&&!el.value.endsWith('\n')?'\n':''
-  el.value+=s+t+'\n';cc(fid,fid==='a-p'?'cc-p':'cc-i');el.focus()
-}
-function cc(fid,cid){const l=document.getElementById(fid).value.length;document.getElementById(cid).textContent=`${l} caractere${l!==1?'s':''}`}
-function limT(){document.getElementById('ct').innerHTML='<div class="empty"><div class="ei">💬</div><div class="etit">Pronto para testar</div></div>'}
-async function doTest(){
-  if(!lojaAtiva){toast('Selecione um cliente','error');return}
-  const msg=document.getElementById('i-t').value.trim();if(!msg) return
-  document.getElementById('i-t').value=''
-  const box=document.getElementById('ct')
-  if(box.querySelector('.empty')) box.innerHTML=''
-  box.innerHTML+=`<div class="bub user"><div class="bw">👤 Cliente simulado</div>${e(msg)}</div>`
-  box.innerHTML+=`<div class="bub assistant" id="bt"><div class="bw">🤖 Agente</div><span style="opacity:.5">digitando...</span></div>`
-  box.scrollTop=box.scrollHeight
-  try{
-    // usa rq corrigida — não TOKEN diretamente
-    const d = await rq('/simulate','POST',{phone:'99900000001',text:msg,loja_id:lojaAtiva.id})
-    const b=document.getElementById('bt')
-    if(b) b.innerHTML=`<div class="bw">🤖 Agente</div>${e(d.reply||d.resposta||d.erro||'Sem resposta')}`
-    box.scrollTop=box.scrollHeight
-  }catch(err){const b=document.getElementById('bt');if(b) b.innerHTML=`<div class="bw">🤖 Agente</div><span style="color:var(--red-600)">Erro: ${err.message}</span>`}
-}
+    const prods = await rq('/admin/produtos?loja_id=' + lojaAtiva.id)
+    const peds  = await rq('/admin/pedidos?loja_id='  + lojaAtiva.id)
+    document.getElementById('s-prod').textContent = prods.filter(p => p.ativo !== false).length
+    document.getElementById('s-ped').textContent  = peds.filter(p => p.status === 'Pendente').length
 
-async function loadProdutos(){
-  if(!lojaAtiva) return
-  const grid=document.getElementById('pgrid')
-  grid.innerHTML='<div class="lr"><span class="spin"></span>Carregando...</div>'
-  try{
-    const prods=await rq(`/admin/produtos?loja_id=${lojaAtiva.id}`)
-    if(!prods.length){grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="ei">▣</div><div class="etit">Nenhum produto</div></div>`;return}
-    grid.innerHTML=prods.map(p=>`<div class="pc"><button class="pd" onclick="delProd('${p.id}')">×</button><div class="pn">${e(p.nome)}</div><div class="ps">${p.sabor?e(p.sabor):'<span style="opacity:.4">—</span>'}</div><div class="pf"><div><div class="pp">R$ ${fR(p.preco_venda)}</div><div class="pq">${p.quantidade!=null?p.quantidade+' un.':'—'}</div></div><span class="badge b-gn">ativo</span></div>${p.descricao?`<div class="pde">${e(p.descricao)}</div>`:''}</div>`).join('')
-  }catch(err){grid.innerHTML=`<div class="lr" style="color:var(--red-600)">Erro: ${err.message}</div>`}
-}
-async function saveProd(){
-  if(!lojaAtiva){toast('Selecione um cliente','error');return}
-  const nome=document.getElementById('pn').value.trim();if(!nome){toast('Nome obrigatório','error');return}
-  const pl={loja_id:lojaAtiva.id,nome,sabor:document.getElementById('psab').value.trim()||null,preco_venda:parseFloat(document.getElementById('ppr').value)||null,quantidade:parseInt(document.getElementById('pqt').value)||null,descricao:document.getElementById('pde').value.trim()||null,ativo:true}
-  try{await rq('/admin/produtos','POST',pl);closeMo('mp');await loadProdutos();toast('Produto adicionado','success')}catch(err){toast('Erro: '+err.message,'error')}
-}
-async function delProd(id){
-  if(!confirm('Remover este produto?')) return
-  try{await rq(`/admin/produtos/${id}`,'PATCH',{ativo:false});await loadProdutos();toast('Removido','success')}catch(err){toast('Erro: '+err.message,'error')}
-}
-
-async function loadPedidos(){
-  if(!lojaAtiva) return
-  const f=document.getElementById('fp').value,tbody=document.getElementById('ptb')
-  tbody.innerHTML=`<tr><td colspan="7" class="lr"><span class="spin"></span>Carregando...</td></tr>`
-  try{
-    const peds=await rq(`/admin/pedidos?loja_id=${lojaAtiva.id}`)
-    const filt=f?peds.filter(p=>p.status===f):peds
-    if(!filt.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">◎</div><div class="etit">Nenhum pedido</div></div></td></tr>`;return}
-    const cls={Pendente:'am',Confirmado:'gn',Entregue:'bl',Cancelado:'rd'}
-    tbody.innerHTML=filt.map(p=>{
-      const its=piItens(p.itens).map(i=>`${i.qty||1}× ${i.nome||'?'}`).join(', ')||'—'
-      const c=cls[p.status]||'sl'
-      return`<tr><td><strong>${e(p.nome_cliente||'—')}</strong><div class="tm" style="font-size:11px;margin-top:2px">${e(p.numero_cliente)}</div></td><td style="font-size:12px;max-width:200px">${e(its)}</td><td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ${fR(p.total)}</strong></td><td class="tmu">${e(p.pagamento||'—')}</td><td><span class="badge b-${c}">${p.status}</span></td><td class="tmu">${fD(p.created_at)}</td><td><select onchange="updPed('${p.id}',this.value)" style="font-size:12px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--font)"><option value="" disabled selected>Atualizar...</option><option value="Confirmado">✅ Confirmar</option><option value="Entregue">📦 Entregue</option><option value="Cancelado">❌ Cancelar</option></select></td></tr>`
-    }).join('')
-  }catch(err){tbody.innerHTML=`<tr><td colspan="7" class="lr" style="color:var(--red-600)">Erro: ${err.message}</td></tr>`}
-}
-async function updPed(id,status){try{await rq(`/admin/pedidos/${id}`,'PATCH',{status});await loadPedidos();toast(`Pedido: ${status}`,'success')}catch(err){toast('Erro: '+err.message,'error')}}
-
-async function loadContatos(){
-  if(!lojaAtiva) return
-  const list=document.getElementById('clist')
-  list.innerHTML='<div class="lr"><span class="spin"></span>Carregando...</div>'
-  try{
-    const cs=await rq(`/admin/conversas/${lojaAtiva.id}/contatos`)
-    if(!cs.length){list.innerHTML='<div class="lr" style="color:var(--text-3)">Nenhuma conversa ainda</div>';return}
-    list.innerHTML=cs.map(c=>`<div onclick="openConv('${e(c.numero)}')" style="padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background='var(--blue-50)'" onmouseout="this.style.background=''"><div style="font-size:13px;font-weight:600;color:var(--text)">${e(c.nome||c.numero)}</div><div style="font-size:11.5px;color:var(--text-3);font-family:var(--mono)">${e(c.numero)}</div>${c.ultima?`<div style="font-size:11.5px;color:var(--text-3);margin-top:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:200px">${e(c.ultima.substring(0,50))}</div>`:''}</div>`).join('')
-  }catch(err){list.innerHTML=`<div class="lr" style="color:var(--red-600)">Erro: ${err.message}</div>`}
-}
-async function openConv(num){
-  contatoAtivo=num
-  document.getElementById('ctit').textContent=`Conversa — ${num}`
-  document.getElementById('bcc').style.display='inline-flex'
-  const box=document.getElementById('cconv')
-  box.innerHTML='<div class="lr"><span class="spin"></span>Carregando...</div>'
-  try{
-    const msgs=await rq(`/admin/conversas/${lojaAtiva.id}/${num}`)
-    if(!msgs.length){box.innerHTML='<div class="empty"><div class="etit">Sem mensagens</div></div>';return}
-    box.innerHTML=msgs.map(m=>`<div class="bub ${m.role}"><div class="bw">${m.role==='user'?'👤 Cliente':'🤖 Agente'}</div>${e(m.content)}</div>`).join('')
-    box.scrollTop=box.scrollHeight
-  }catch(err){box.innerHTML=`<div class="lr" style="color:var(--red-600)">Erro: ${err.message}</div>`}
-}
-async function clrConv(){
-  if(!confirm(`Limpar histórico de ${contatoAtivo}?`)) return
-  try{await rq(`/admin/conversas/${lojaAtiva.id}/${contatoAtivo}`,'DELETE');document.getElementById('cconv').innerHTML='<div class="empty"><div class="etit">Histórico apagado</div></div>';await loadContatos();toast('Histórico apagado','success')}catch(err){toast('Erro: '+err.message,'error')}
-}
-
-// ── CONEXÃO WHATSAPP ─────────────────────────────────────────────────────────
-async function checkConnStatus(){
-  const box=document.getElementById('conn-status-box')
-  const pairDiv=document.getElementById('pairing-display')
-  box.className='conn-status waiting'
-  box.innerHTML='<span class="spin"></span>Verificando...'
-  pairDiv.style.display='none'
-  try{
-    const s=await rq('/connect-status')
-    if(s.status==='conectado'){
-      box.className='conn-status connected'
-      box.innerHTML=`✅ WhatsApp conectado — número: <strong>${s.numero||'—'}</strong>`
-    }else if(s.status==='pairing_code'&&s.pairingCode){
-      box.className='conn-status waiting'
-      box.innerHTML='⏳ Aguardando vinculação — digite o código abaixo no WhatsApp'
-      document.getElementById('pair-code-val').textContent=s.pairingCode
-      pairDiv.style.display='block'
-    }else if(s.status==='erro'){
-      box.className='conn-status error'
-      box.innerHTML=`❌ Erro: ${s.erro||'desconhecido'}`
-    }else{
-      box.className='conn-status waiting'
-      box.innerHTML='⏳ '+({aguardando:'Aguardando conexão',qr:'QR gerado no terminal',desconectado:'Desconectado'}[s.status]||s.status)
+    const tbody = document.getElementById('dp-tbody')
+    const lt = peds.slice(0, 5)
+    if (!lt.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="ei">◎</div><div class="etit">Nenhum pedido</div></div></td></tr>'
+      return
     }
-  }catch(err){
-    box.className='conn-status error'
-    box.innerHTML=`❌ Não foi possível verificar: ${err.message}`
+    const cls = { Pendente:'am', Confirmado:'gn', Entregue:'bl', Cancelado:'rd' }
+    tbody.innerHTML = lt.map(function(p) {
+      const its = piItens(p.itens).map(i => (i.qty || 1) + '× ' + (i.nome || '?')).join(', ') || '—'
+      const c = cls[p.status] || 'sl'
+      return '<tr>' +
+        '<td><strong>' + e(p.nome_cliente || '—') + '</strong><br><span class="tmu">' + e(p.numero_cliente) + '</span></td>' +
+        '<td style="font-size:12px;max-width:180px">' + e(its) + '</td>' +
+        '<td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ' + fR(p.total) + '</strong></td>' +
+        '<td><span class="badge b-' + c + '">' + p.status + '</span></td>' +
+        '<td class="tmu">' + fD(p.created_at) + '</td></tr>'
+    }).join('')
+  } catch(err) { console.error('Dashboard:', err) }
+}
+
+// ── Agente & Prompt ──────────────────────────────────────────────────────────
+function loadAgenteForm() {
+  if (!lojaAtiva) return
+  document.getElementById('a-p').value = lojaAtiva.prompt_base || ''
+  document.getElementById('a-i').value = lojaAtiva.instrucoes_extras || ''
+  cc('a-p', 'cc-p')
+  cc('a-i', 'cc-i')
+}
+
+async function salvarAgente() {
+  if (!lojaAtiva) { toast('Selecione um cliente', 'error'); return }
+  const prompt_base       = document.getElementById('a-p').value
+  const instrucoes_extras = document.getElementById('a-i').value
+  try {
+    await rq('/admin/lojas/' + lojaAtiva.id, 'PATCH', { prompt_base, instrucoes_extras })
+    lojaAtiva.prompt_base       = prompt_base
+    lojaAtiva.instrucoes_extras = instrucoes_extras
+    toast('Salvo — efeito na próxima mensagem', 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
+}
+
+function addChip(fid, t) {
+  const el = document.getElementById(fid)
+  const sep = el.value && !el.value.endsWith('\n') ? '\n' : ''
+  el.value += sep + t + '\n'
+  cc(fid, fid === 'a-p' ? 'cc-p' : 'cc-i')
+  el.focus()
+}
+
+function cc(fid, cid) {
+  const l = document.getElementById(fid).value.length
+  document.getElementById(cid).textContent = l + ' caractere' + (l !== 1 ? 's' : '')
+}
+
+function limT() {
+  document.getElementById('ct').innerHTML = '<div class="empty"><div class="ei">💬</div><div class="etit">Pronto para testar</div></div>'
+}
+
+async function doTest() {
+  if (!lojaAtiva) { toast('Selecione um cliente', 'error'); return }
+  const msg = document.getElementById('i-t').value.trim()
+  if (!msg) return
+  document.getElementById('i-t').value = ''
+  const box = document.getElementById('ct')
+  if (box.querySelector('.empty')) box.innerHTML = ''
+  box.innerHTML += '<div class="bub user"><div class="bw">👤 Cliente simulado</div>' + e(msg) + '</div>'
+  box.innerHTML += '<div class="bub assistant" id="bt"><div class="bw">🤖 Agente</div><span style="opacity:.5">digitando...</span></div>'
+  box.scrollTop = box.scrollHeight
+  try {
+    const d = await rq('/simulate', 'POST', { phone: '99900000001', text: msg, loja_id: lojaAtiva.id })
+    const b = document.getElementById('bt')
+    if (b) b.innerHTML = '<div class="bw">🤖 Agente</div>' + e(d.reply || d.resposta || d.erro || 'Sem resposta')
+    box.scrollTop = box.scrollHeight
+  } catch(err) {
+    const b = document.getElementById('bt')
+    if (b) b.innerHTML = '<div class="bw">🤖 Agente</div><span style="color:var(--red-600)">Erro: ' + err.message + '</span>'
   }
 }
 
-async function doConnect(){
-  const num=document.getElementById('conn-num').value.replace(/\D/g,'')
-  if(!num){toast('Informe o número','error');return}
-  const btn=document.getElementById('btn-connect')
-  const msg=document.getElementById('conn-msg')
-  btn.disabled=true;btn.textContent='Aguardando código...'
-  msg.textContent='⏳ Conectando... pode levar até 15 segundos.'
-  const pairDiv=document.getElementById('pairing-display')
-  pairDiv.style.display='none'
-  try{
-    const r=await rq('/connect','POST',{numero:num})
-    if(r.status==='pairing_code'){
-      msg.textContent=''
-      document.getElementById('pair-code-val').textContent=r.code
-      pairDiv.style.display='block'
-      document.getElementById('conn-status-box').className='conn-status waiting'
-      document.getElementById('conn-status-box').innerHTML='⏳ Aguardando vinculação — digite o código no WhatsApp'
-      toast('Código gerado! Digite no WhatsApp em até 60s.','success')
-      // Polling para detectar quando conectar
-      let polls=0
-      const iv=setInterval(async()=>{
+// ── Produtos ─────────────────────────────────────────────────────────────────
+async function loadProdutos() {
+  if (!lojaAtiva) return
+  const grid = document.getElementById('pgrid')
+  grid.innerHTML = '<div class="lr"><span class="spin"></span>Carregando...</div>'
+  try {
+    const prods = await rq('/admin/produtos?loja_id=' + lojaAtiva.id)
+    if (!prods.length) {
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="ei">▣</div><div class="etit">Nenhum produto</div><div class="ede">Adicione os produtos que o agente vai oferecer</div></div>'
+      return
+    }
+    grid.innerHTML = prods.map(function(p) {
+      return '<div class="pc">' +
+        '<button class="pd" onclick="delProd(\'' + p.id + '\')" title="Remover">×</button>' +
+        '<div class="pn">' + e(p.nome) + '</div>' +
+        '<div class="ps">' + (p.sabor ? e(p.sabor) : '<span style="opacity:.4">—</span>') + '</div>' +
+        '<div class="pf"><div>' +
+          '<div class="pp">R$ ' + fR(p.preco_venda) + '</div>' +
+          '<div class="pq">' + (p.quantidade != null ? p.quantidade + ' un. estoque' : '—') + '</div>' +
+        '</div><span class="badge b-gn">ativo</span></div>' +
+        (p.descricao ? '<div class="pde">' + e(p.descricao) + '</div>' : '') +
+        '</div>'
+    }).join('')
+  } catch(err) { grid.innerHTML = '<div class="lr" style="color:var(--red-600)">Erro: ' + err.message + '</div>' }
+}
+
+async function saveProd() {
+  if (!lojaAtiva) { toast('Selecione um cliente', 'error'); return }
+  const nome = document.getElementById('pn').value.trim()
+  if (!nome) { toast('Nome é obrigatório', 'error'); return }
+  const pl = {
+    loja_id:     lojaAtiva.id,
+    nome:        nome,
+    sabor:       document.getElementById('psab').value.trim() || null,
+    preco_venda: parseFloat(document.getElementById('ppr').value) || null,
+    quantidade:  parseInt(document.getElementById('pqt').value)   || null,
+    descricao:   document.getElementById('pde').value.trim()      || null,
+    ativo:       true
+  }
+  try {
+    await rq('/admin/produtos', 'POST', pl)
+    closeMo('mp')
+    await loadProdutos()
+    toast('Produto adicionado — o agente já o usa', 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
+}
+
+async function delProd(id) {
+  if (!confirm('Remover este produto?')) return
+  try {
+    await rq('/admin/produtos/' + id, 'PATCH', { ativo: false })
+    await loadProdutos()
+    toast('Produto removido', 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
+}
+
+// ── Pedidos ──────────────────────────────────────────────────────────────────
+async function loadPedidos() {
+  if (!lojaAtiva) return
+  const filter = document.getElementById('fp').value
+  const tbody  = document.getElementById('ptb')
+  tbody.innerHTML = '<tr><td colspan="7" class="lr"><span class="spin"></span>Carregando...</td></tr>'
+  try {
+    const peds   = await rq('/admin/pedidos?loja_id=' + lojaAtiva.id)
+    const filtered = filter ? peds.filter(p => p.status === filter) : peds
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="ei">◎</div><div class="etit">Nenhum pedido</div></div></td></tr>'
+      return
+    }
+    const cls = { Pendente:'am', Confirmado:'gn', Entregue:'bl', Cancelado:'rd' }
+    tbody.innerHTML = filtered.map(function(p) {
+      const its = piItens(p.itens).map(i => (i.qty || 1) + '× ' + (i.nome || '?')).join(', ') || '—'
+      const c = cls[p.status] || 'sl'
+      return '<tr>' +
+        '<td><strong>' + e(p.nome_cliente || '—') + '</strong><div class="tm" style="font-size:11px;margin-top:2px">' + e(p.numero_cliente) + '</div></td>' +
+        '<td style="font-size:12px;max-width:200px">' + e(its) + '</td>' +
+        '<td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ' + fR(p.total) + '</strong></td>' +
+        '<td class="tmu">' + e(p.pagamento || '—') + '</td>' +
+        '<td><span class="badge b-' + c + '">' + p.status + '</span></td>' +
+        '<td class="tmu">' + fD(p.created_at) + '</td>' +
+        '<td><select onchange="updPed(\'' + p.id + '\',this.value)" style="font-size:12px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--font)">' +
+          '<option value="" disabled selected>Atualizar...</option>' +
+          '<option value="Confirmado">✅ Confirmar</option>' +
+          '<option value="Entregue">📦 Entregue</option>' +
+          '<option value="Cancelado">❌ Cancelar</option>' +
+        '</select></td></tr>'
+    }).join('')
+  } catch(err) { tbody.innerHTML = '<tr><td colspan="7" class="lr" style="color:var(--red-600)">Erro: ' + err.message + '</td></tr>' }
+}
+
+async function updPed(id, status) {
+  try {
+    await rq('/admin/pedidos/' + id, 'PATCH', { status })
+    await loadPedidos()
+    toast('Pedido: ' + status, 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
+}
+
+// ── Conversas ────────────────────────────────────────────────────────────────
+async function loadContatos() {
+  if (!lojaAtiva) return
+  const list = document.getElementById('clist')
+  list.innerHTML = '<div class="lr"><span class="spin"></span>Carregando...</div>'
+  try {
+    const cs = await rq('/admin/conversas/' + lojaAtiva.id + '/contatos')
+    if (!cs.length) { list.innerHTML = '<div class="lr" style="color:var(--text-3)">Nenhuma conversa ainda</div>'; return }
+    list.innerHTML = cs.map(function(c) {
+      return '<div onclick="openConv(\'' + e(c.numero) + '\')" style="padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--blue-50)\'" onmouseout="this.style.background=\'\'">' +
+        '<div style="font-size:13px;font-weight:600;color:var(--text)">' + e(c.nome || c.numero) + '</div>' +
+        '<div style="font-size:11.5px;color:var(--text-3);font-family:var(--mono)">' + e(c.numero) + '</div>' +
+        (c.ultima ? '<div style="font-size:11.5px;color:var(--text-3);margin-top:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:200px">' + e(c.ultima.substring(0, 50)) + '</div>' : '') +
+        '</div>'
+    }).join('')
+  } catch(err) { list.innerHTML = '<div class="lr" style="color:var(--red-600)">Erro: ' + err.message + '</div>' }
+}
+
+async function openConv(num) {
+  contatoAtivo = num
+  document.getElementById('ctit').textContent = 'Conversa — ' + num
+  document.getElementById('bcc').style.display = 'inline-flex'
+  const box = document.getElementById('cconv')
+  box.innerHTML = '<div class="lr"><span class="spin"></span>Carregando...</div>'
+  try {
+    const msgs = await rq('/admin/conversas/' + lojaAtiva.id + '/' + num)
+    if (!msgs.length) { box.innerHTML = '<div class="empty"><div class="etit">Sem mensagens</div></div>'; return }
+    box.innerHTML = msgs.map(m =>
+      '<div class="bub ' + m.role + '"><div class="bw">' + (m.role === 'user' ? '👤 Cliente' : '🤖 Agente') + '</div>' + e(m.content) + '</div>'
+    ).join('')
+    box.scrollTop = box.scrollHeight
+  } catch(err) { box.innerHTML = '<div class="lr" style="color:var(--red-600)">Erro: ' + err.message + '</div>' }
+}
+
+async function clrConv() {
+  if (!confirm('Limpar histórico de ' + contatoAtivo + '?')) return
+  try {
+    await rq('/admin/conversas/' + lojaAtiva.id + '/' + contatoAtivo, 'DELETE')
+    document.getElementById('cconv').innerHTML = '<div class="empty"><div class="etit">Histórico apagado</div></div>'
+    await loadContatos()
+    toast('Histórico apagado', 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
+}
+
+// ── Conexão WhatsApp ─────────────────────────────────────────────────────────
+async function checkConnStatus() {
+  const box     = document.getElementById('conn-status-box')
+  const pairDiv = document.getElementById('pairing-display')
+  box.className = 'conn-status waiting'
+  box.innerHTML = '<span class="spin"></span>Verificando...'
+  pairDiv.style.display = 'none'
+  try {
+    const s = await rq('/connect-status')
+    if (s.status === 'conectado') {
+      box.className = 'conn-status connected'
+      box.innerHTML = '✅ WhatsApp conectado — número: <strong>' + (s.numero || '—') + '</strong>'
+    } else if (s.status === 'pairing_code' && s.pairingCode) {
+      box.className = 'conn-status waiting'
+      box.innerHTML = '⏳ Aguardando vinculação — digite o código abaixo no WhatsApp'
+      document.getElementById('pair-code-val').textContent = s.pairingCode
+      pairDiv.style.display = 'block'
+    } else if (s.status === 'erro') {
+      box.className = 'conn-status error'
+      box.innerHTML = '❌ Erro: ' + (s.erro || 'desconhecido')
+    } else {
+      const msgs = { aguardando: 'Aguardando conexão', qr: 'QR gerado no terminal', desconectado: 'Desconectado' }
+      box.className = 'conn-status waiting'
+      box.innerHTML = '⏳ ' + (msgs[s.status] || s.status)
+    }
+  } catch(err) {
+    box.className = 'conn-status error'
+    box.innerHTML = '❌ Não foi possível verificar: ' + err.message
+  }
+}
+
+async function doConnect() {
+  const num = document.getElementById('conn-num').value.replace(/\D/g, '')
+  if (!num) { toast('Informe o número', 'error'); return }
+  const btn     = document.getElementById('btn-connect')
+  const msg     = document.getElementById('conn-msg')
+  const pairDiv = document.getElementById('pairing-display')
+  btn.disabled = true
+  btn.textContent = 'Aguardando código...'
+  msg.textContent = '⏳ Conectando... pode levar até 15 segundos.'
+  pairDiv.style.display = 'none'
+  try {
+    const r = await rq('/connect', 'POST', { numero: num })
+    if (r.status === 'pairing_code') {
+      msg.textContent = ''
+      document.getElementById('pair-code-val').textContent = r.code
+      pairDiv.style.display = 'block'
+      document.getElementById('conn-status-box').className = 'conn-status waiting'
+      document.getElementById('conn-status-box').innerHTML = '⏳ Aguardando vinculação — digite o código no WhatsApp'
+      toast('Código gerado! Digite no WhatsApp em até 60s.', 'success')
+      var polls = 0
+      var iv = setInterval(async function() {
         polls++
-        const s=await rq('/connect-status').catch(()=>null)
-        if(s?.status==='conectado'){
+        var s = await rq('/connect-status').catch(() => null)
+        if (s && s.status === 'conectado') {
           clearInterval(iv)
-          pairDiv.style.display='none'
-          document.getElementById('conn-status-box').className='conn-status connected'
-          document.getElementById('conn-status-box').innerHTML=`✅ Conectado — ${s.numero}`
-          toast('WhatsApp conectado com sucesso!','success')
+          pairDiv.style.display = 'none'
+          document.getElementById('conn-status-box').className = 'conn-status connected'
+          document.getElementById('conn-status-box').innerHTML = '✅ Conectado — ' + s.numero
+          toast('WhatsApp conectado com sucesso!', 'success')
           pollStatus()
         }
-        if(polls>30) clearInterval(iv)
-      },3000)
-    }else if(r.status==='ja_conectado'){
-      document.getElementById('conn-status-box').className='conn-status connected'
-      document.getElementById('conn-status-box').innerHTML=`✅ Já conectado — ${r.numero}`
-      msg.textContent=''
-      toast('WhatsApp já está conectado','success')
-    }else{
-      msg.textContent=`Erro: ${r.erro||JSON.stringify(r)}`
+        if (polls > 30) clearInterval(iv)
+      }, 3000)
+    } else if (r.status === 'ja_conectado') {
+      document.getElementById('conn-status-box').className = 'conn-status connected'
+      document.getElementById('conn-status-box').innerHTML = '✅ Já conectado — ' + r.numero
+      msg.textContent = ''
+      toast('WhatsApp já está conectado', 'success')
+    } else {
+      msg.textContent = 'Erro: ' + (r.erro || JSON.stringify(r))
     }
-  }catch(err){msg.textContent=`Erro: ${err.message}`}
-  finally{btn.disabled=false;btn.textContent='Gerar código de vinculação →'}
+  } catch(err) { msg.textContent = 'Erro: ' + err.message }
+  finally { btn.disabled = false; btn.textContent = 'Gerar código de vinculação →' }
 }
 
-async function doDisconnect(){
-  if(!confirm('Desconectar e apagar a sessão atual?')) return
-  try{
-    await rq('/disconnect','POST')
+async function doDisconnect() {
+  if (!confirm('Desconectar e apagar a sessão atual?')) return
+  try {
+    await rq('/disconnect', 'POST')
     await checkConnStatus()
-    toast('Sessão encerrada','success')
-  }catch(err){toast('Erro: '+err.message,'error')}
+    toast('Sessão encerrada', 'success')
+  } catch(err) { toast('Erro: ' + err.message, 'error') }
 }
 
-// ── UTILS ────────────────────────────────────────────────────────────────────
-function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
-function fR(v){return Number(v||0).toFixed(2).replace('.',',')}
-function fD(s){if(!s)return'—';return new Date(s).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
-function piItens(raw){if(!raw)return[];if(Array.isArray(raw))return raw;try{return JSON.parse(raw)}catch{return[]}}
-function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className=`show ${type}`;clearTimeout(el._t);el._t=setTimeout(()=>{el.className=''},3500)}
-document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',ev=>{if(ev.target===o)closeMo(o.id)}))
+// ── Utils ────────────────────────────────────────────────────────────────────
+function e(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') }
+function fR(v) { return Number(v || 0).toFixed(2).replace('.', ',') }
+function fD(s) { if (!s) return '—'; return new Date(s).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) }
+function piItens(raw) { if (!raw) return []; if (Array.isArray(raw)) return raw; try { return JSON.parse(raw) } catch { return [] } }
+function toast(msg, type) {
+  type = type || 'success'
+  var el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = 'show ' + type
+  clearTimeout(el._t)
+  el._t = setTimeout(function() { el.className = '' }, 3500)
+}
+document.querySelectorAll('.mo').forEach(function(o) {
+  o.addEventListener('click', function(ev) { if (ev.target === o) closeMo(o.id) })
+})
 </script>
 </body>
 </html>
