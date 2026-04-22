@@ -460,6 +460,16 @@ code{font-family:var(--mono);font-size:12px;background:var(--slate-100);color:va
 <script>
 let API='',SECRET='',lojaAtiva=null,todasLojas=[],editLojaId=null,contatoAtivo=null,pgAtual='dashboard'
 
+async function apiFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    headers: {
+      'x-admin-secret': SECRET,
+      ...(options.headers || {})
+    }
+  })
+}
+  
 async function doLogin(){
   API=document.getElementById('i-url').value.trim().replace(/\/$/,'')
   SECRET=document.getElementById('i-sec').value.trim()
