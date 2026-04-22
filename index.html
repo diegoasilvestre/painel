@@ -650,7 +650,7 @@ async function doTest(){
   box.innerHTML+=`<div class="bub assistant" id="bt"><div class="bw">🤖 Agente</div><span style="opacity:.5">digitando...</span></div>`
   box.scrollTop=box.scrollHeight
   try{
-    const r=await fetch(`${API}/simulate`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-secret':SECRET},body:JSON.stringify({phone:'99900000001',text:msg,loja_id:lojaAtiva.id})})
+    const r=await fetch(`${API}/simulate`,{method:'POST',headers:{'Content-Type':'application/json','Authorization': 'Bearer ' + TOKEN},body:JSON.stringify({phone:'99900000001',text:msg,loja_id:lojaAtiva.id})})
     const d=await r.json()
     const b=document.getElementById('bt')
     if(b) b.innerHTML=`<div class="bw">🤖 Agente</div>${e(d.reply||d.resposta||d.erro||'Sem resposta')}`
