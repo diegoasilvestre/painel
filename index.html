@@ -7,2038 +7,793 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════════
-   DESIGN TOKENS — Enterprise / Azure-inspired
-   Palette: white + blue
-══════════════════════════════════════════════ */
-:root {
-  --blue-50:  #EFF6FF;
-  --blue-100: #DBEAFE;
-  --blue-200: #BFDBFE;
-  --blue-400: #60A5FA;
-  --blue-500: #3B82F6;
-  --blue-600: #1D63ED;
-  --blue-700: #1D4ED8;
-  --blue-900: #1E3A5F;
+:root{
+  --blue-50:#EFF6FF;--blue-100:#DBEAFE;--blue-200:#BFDBFE;
+  --blue-600:#1D63ED;--blue-700:#1D4ED8;--blue-900:#1E3A5F;
+  --slate-100:#F1F5F9;--slate-200:#E2E8F0;--slate-300:#CBD5E1;
+  --slate-400:#94A3B8;--slate-500:#64748B;--slate-600:#475569;--slate-900:#0F172A;
+  --green-50:#F0FDF4;--green-500:#22C55E;--green-600:#16A34A;--green-700:#15803D;
+  --amber-50:#FFFBEB;--amber-500:#F59E0B;--amber-600:#D97706;
+  --red-50:#FFF1F2;--red-500:#EF4444;--red-600:#DC2626;
+  --bg:#fff;--bg-sub:#F8FAFC;--bg-hover:#F1F5F9;
+  --border:#E2E8F0;--border-2:#CBD5E1;
+  --text:#0F172A;--text-2:#475569;--text-3:#94A3B8;
+  --primary:#1D63ED;--primary-h:#1D4ED8;
+  --sw:240px;--th:58px;--r:8px;--rl:12px;
+  --sh:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+  --shm:0 4px 12px rgba(15,23,42,.08),0 2px 4px rgba(15,23,42,.04);
+  --shl:0 16px 40px rgba(15,23,42,.12),0 4px 8px rgba(15,23,42,.06);
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono','Fira Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:13.5px;line-height:1.6;color:var(--text);background:var(--bg-sub);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:10px}
 
-  --slate-50:  #F8FAFC;
-  --slate-100: #F1F5F9;
-  --slate-200: #E2E8F0;
-  --slate-300: #CBD5E1;
-  --slate-400: #94A3B8;
-  --slate-500: #64748B;
-  --slate-600: #475569;
-  --slate-700: #334155;
-  --slate-800: #1E293B;
-  --slate-900: #0F172A;
+/* LOGIN */
+#sl{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EFF6FF,#F8FAFC 40%,#DBEAFE);position:relative;overflow:hidden}
+#sl::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,.08),transparent 70%);top:-100px;right:-100px;pointer-events:none}
+.lc{background:#fff;border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shl);padding:44px 48px;width:420px;animation:su .35s cubic-bezier(.22,.61,.36,1) both}
+@keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.lb{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.li{width:36px;height:36px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.ln{font-size:17px;font-weight:700;color:var(--slate-900);letter-spacing:-.3px}
+.ln small{display:block;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.02em;margin-top:-2px}
+.lsep{height:1px;background:var(--border);margin:24px 0}
+.fl{display:block;font-size:11.5px;font-weight:600;color:var(--text-2);margin-bottom:6px;letter-spacing:.02em}
+.fi{width:100%;padding:9px 13px;background:var(--bg-sub);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;margin-bottom:14px}
+.fi:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,99,237,.1);background:#fff}
+.fh{font-size:11px;color:var(--text-3);margin-top:-10px;margin-bottom:14px;font-family:var(--mono)}
+.lbtn{width:100%;padding:11px;background:var(--primary);color:#fff;font-family:var(--font);font-size:13.5px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;transition:background .15s,box-shadow .15s,transform .08s;margin-top:4px}
+.lbtn:hover{background:var(--primary-h);box-shadow:0 4px 12px rgba(29,99,237,.3)}
+.lbtn:active{transform:scale(.99)}
+.lerr{display:none;margin-top:14px;padding:10px 13px;background:var(--red-50);border:1px solid #FECACA;border-radius:var(--r);color:var(--red-600);font-size:12.5px}
 
-  --green-50:  #F0FDF4;
-  --green-500: #22C55E;
-  --green-600: #16A34A;
-  --green-700: #15803D;
+/* APP */
+#sa{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;width:var(--sw);height:100vh;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+.sh{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;min-height:var(--th)}
+.bi{width:30px;height:30px;background:var(--primary);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;font-family:var(--mono);flex-shrink:0}
+.bt{font-size:13px;font-weight:700;color:var(--slate-900);letter-spacing:-.2px;line-height:1.2}
+.bt small{display:block;font-size:10px;font-weight:500;color:var(--text-3);letter-spacing:.03em}
+.cs{padding:12px 14px;border-bottom:1px solid var(--border)}
+.cs label{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
+.cs select{width:100%;padding:7px 10px;background:var(--bg-sub);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:12.5px;color:var(--text);outline:none;cursor:pointer}
+.cs select:focus{border-color:var(--primary)}
+.ng{padding:14px 10px 4px}
+.ngl{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;padding:0 8px 6px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r);cursor:pointer;color:var(--text-2);font-size:13px;font-weight:500;transition:background .12s,color .12s;border:1.5px solid transparent;margin-bottom:1px;user-select:none}
+.ni:hover{background:var(--blue-50);color:var(--blue-700)}
+.ni.active{background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-100);font-weight:600}
+.ni .ico{width:18px;text-align:center;flex-shrink:0;opacity:.7}
+.ni.active .ico{opacity:1}
+.sf{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border)}
+.ws{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg-sub);border-radius:var(--r);border:1px solid var(--border)}
+.sd{width:8px;height:8px;border-radius:50%;background:var(--slate-300);flex-shrink:0;transition:background .3s}
+.sd.online{background:var(--green-500);box-shadow:0 0 0 3px rgba(34,197,94,.15);animation:pg 2.5s infinite}
+@keyframes pg{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.15)}50%{box-shadow:0 0 0 5px rgba(34,197,94,.05)}}
+.wl{font-size:11.5px;font-weight:600;color:var(--text-2)}
+.wn{font-size:10.5px;color:var(--text-3);font-family:var(--mono)}
+.blo{font-size:11px;color:var(--text-3);cursor:pointer;margin-top:10px;display:block;text-align:center;padding:5px;border-radius:5px;transition:background .12s,color .12s}
+.blo:hover{background:var(--red-50);color:var(--red-600)}
 
-  --amber-50:  #FFFBEB;
-  --amber-500: #F59E0B;
-  --amber-600: #D97706;
+/* MAIN */
+.mw{margin-left:var(--sw);min-height:100vh}
+.topbar{height:var(--th);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50}
+.bc{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-3)}
+.bc .sep{color:var(--slate-300)}
+.bc .cur{color:var(--text);font-weight:600}
+.content{padding:28px}
+.page{display:none;animation:pi .22s cubic-bezier(.22,.61,.36,1) both}
+.page.active{display:block}
+@keyframes pi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.seh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.set{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.3px;line-height:1.3}
+.sed{font-size:13px;color:var(--text-3);margin-top:3px}
 
-  --red-50:   #FFF1F2;
-  --red-500:  #EF4444;
-  --red-600:  #DC2626;
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.sc{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:20px 22px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary);opacity:0;transition:opacity .2s}
+.sc:hover::before{opacity:1}
+.sl2{font-size:11.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.sv{font-size:30px;font-weight:700;color:var(--text);font-family:var(--mono);letter-spacing:-1px}
+.ss{font-size:11.5px;color:var(--text-3);margin-top:4px}
+.sc.blue .sv{color:var(--blue-600)}
+.sc.green .sv{color:var(--green-600)}
+.sc.amber .sv{color:var(--amber-600)}
 
-  /* Semantic */
-  --bg:       #FFFFFF;
-  --bg-sub:   #F8FAFC;
-  --bg-hover: #F1F5F9;
-  --border:   #E2E8F0;
-  --border-2: #CBD5E1;
-  --text:     #0F172A;
-  --text-2:   #475569;
-  --text-3:   #94A3B8;
-  --primary:  var(--blue-600);
-  --primary-h: var(--blue-700);
+/* CARD */
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden;margin-bottom:20px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.ct{font-size:14px;font-weight:600;color:var(--text)}
+.cd{font-size:12px;color:var(--text-3);margin-top:2px}
+.cb{padding:20px}
 
-  --sidebar-w: 240px;
-  --topbar-h:  58px;
-  --radius:    8px;
-  --radius-lg: 12px;
-  --shadow-sm: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
-  --shadow:    0 4px 12px rgba(15,23,42,.08), 0 2px 4px rgba(15,23,42,.04);
-  --shadow-lg: 0 16px 40px rgba(15,23,42,.12), 0 4px 8px rgba(15,23,42,.06);
+/* BOTÕES */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);border:1.5px solid transparent;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .14s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-p{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-p:hover{background:var(--primary-h);border-color:var(--primary-h);box-shadow:0 3px 10px rgba(29,99,237,.25)}
+.btn-o{background:#fff;color:var(--text-2);border-color:var(--border-2,#CBD5E1)}
+.btn-o:hover{background:var(--bg-sub);color:var(--text)}
+.btn-g{background:transparent;color:var(--text-3);border-color:transparent}
+.btn-g:hover{background:var(--bg-hover);color:var(--text-2)}
+.btn-d{background:var(--red-50);color:var(--red-600);border-color:#FECACA}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-xs{padding:3px 9px;font-size:11.5px;border-radius:5px}
+.btn-grp{display:flex;gap:8px;flex-wrap:wrap}
 
-  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --mono: 'IBM Plex Mono', 'Fira Code', monospace;
-}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:600}
+.b-bl{background:var(--blue-50);color:var(--blue-700);border:1px solid var(--blue-100)}
+.b-gn{background:var(--green-50);color:var(--green-700);border:1px solid #BBF7D0}
+.b-am{background:var(--amber-50);color:var(--amber-600);border:1px solid #FDE68A}
+.b-rd{background:var(--red-50);color:var(--red-600);border:1px solid #FECACA}
+.b-sl{background:var(--slate-100);color:var(--slate-600);border:1px solid var(--border)}
+.bdot{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* TABELA */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1.5px solid var(--border)}
+th{padding:10px 16px;text-align:left;font-size:11.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:var(--bg-sub)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover td{background:var(--blue-50)}
+.tm{font-family:var(--mono);font-size:12px;color:var(--text-2)}
+.tmu{color:var(--text-3);font-size:12px}
 
-html { scroll-behavior: smooth; }
+/* FORM */
+.field{margin-bottom:16px}
+.fll{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+.fhi{font-size:11.5px;color:var(--text-3);margin-top:5px}
+.input,select,textarea{width:100%;padding:9px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;resize:vertical}
+.input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,99,237,.08)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.im{font-family:var(--mono);font-size:12.5px}
 
-body {
-  font-family: var(--font);
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--text);
-  background: var(--bg-sub);
-  -webkit-font-smoothing: antialiased;
-}
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{padding:4px 10px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;font-size:11.5px;font-weight:500;color:var(--blue-700);cursor:pointer;transition:all .12s}
+.chip:hover{background:var(--blue-100);border-color:var(--blue-200)}
+.cct{font-size:11px;color:var(--text-3);text-align:right;margin-top:4px;font-family:var(--mono)}
 
-/* ── SCROLLBAR ──────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--slate-300); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--slate-400); }
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shl);width:520px;max-height:88vh;overflow-y:auto;animation:su .22s cubic-bezier(.22,.61,.36,1) both}
+.mh{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:700;color:var(--text)}
+.mc{width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;font-size:18px;color:var(--text-3);display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s}
+.mc:hover{background:var(--bg-hover);color:var(--text)}
+.mb{padding:20px 24px}
+.mf{padding:14px 24px 20px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);background:var(--bg-sub)}
 
-/* ══════════════════════════════════════════════
-   TELA DE LOGIN
-══════════════════════════════════════════════ */
-#screen-login {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 40%, #DBEAFE 100%);
-  position: relative;
-  overflow: hidden;
-}
-#screen-login::before {
-  content: '';
-  position: absolute;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(59,130,246,.08) 0%, transparent 70%);
-  top: -100px; right: -100px;
-  pointer-events: none;
-}
+/* CHAT */
+.cl{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;padding:4px}
+.bub{padding:9px 13px;border-radius:var(--r);font-size:13px;line-height:1.55;max-width:78%}
+.bw{font-size:10.5px;font-weight:600;color:var(--text-3);margin-bottom:4px}
+.bub.user{background:var(--bg-sub);border:1px solid var(--border);align-self:flex-start}
+.bub.assistant{background:var(--blue-50);border:1px solid var(--blue-100);align-self:flex-end}
+.bub.assistant .bw{color:var(--blue-600)}
 
-.login-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 44px 48px;
-  width: 420px;
-  position: relative;
-  animation: slideUp .35s cubic-bezier(.22,.61,.36,1) both;
-}
+/* PRODUTOS */
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:20px}
+.pc{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:var(--sh);position:relative;transition:border-color .15s,box-shadow .15s}
+.pc:hover{border-color:var(--blue-200);box-shadow:var(--shm)}
+.pn{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px;padding-right:26px;line-height:1.3}
+.ps{font-size:12px;color:var(--text-3);margin-bottom:12px}
+.pf{display:flex;align-items:flex-end;justify-content:space-between}
+.pp{font-size:17px;font-weight:700;color:var(--blue-600);font-family:var(--mono)}
+.pq{font-size:11px;color:var(--text-3);margin-top:2px}
+.pd{position:absolute;top:12px;right:12px;width:22px;height:22px;background:none;border:none;border-radius:5px;cursor:pointer;color:var(--text-3);font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s}
+.pd:hover{background:var(--red-50);color:var(--red-600)}
+.pde{font-size:11.5px;color:var(--text-3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5}
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+/* MISC */
+.alert{padding:12px 16px;border-radius:var(--r);font-size:13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
+.a-i{background:var(--blue-50);border:1px solid var(--blue-100);color:var(--blue-900)}
+.a-w{background:var(--amber-50);border:1px solid #FDE68A;color:#78350F}
+.a-g{background:var(--green-50);border:1px solid #BBF7D0;color:var(--green-700)}
+.ai{flex-shrink:0;font-size:15px}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+.empty{text-align:center;padding:48px 20px;color:var(--text-3)}
+.ei{font-size:36px;margin-bottom:12px;opacity:.5}
+.etit{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:4px}
+.ede{font-size:12.5px}
+.lr{padding:32px;text-align:center;color:var(--text-3);font-size:13px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sp .6s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+pre{background:var(--slate-900);color:#93C5FD;font-family:var(--mono);font-size:12px;padding:16px;border-radius:var(--r);overflow-x:auto;line-height:1.7;margin:10px 0;white-space:pre-wrap}
+code{font-family:var(--mono);font-size:12px;background:var(--slate-100);color:var(--blue-700);padding:1px 6px;border-radius:4px}
+.req{color:var(--red-500);margin-left:2px}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--slate-900);color:#fff;padding:11px 18px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--shl);transform:translateY(80px);opacity:0;transition:all .22s cubic-bezier(.22,.61,.36,1);z-index:999;max-width:340px;display:flex;align-items:center;gap:9px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success::before{content:'✓';width:18px;height:18px;background:var(--green-500);border-radius:50%;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+#toast.error::before{content:'✕';width:18px;height:18px;background:var(--red-500);border-radius:50%;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 
-.login-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-.login-brand-icon {
-  width: 36px; height: 36px;
-  background: var(--primary);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-  font-family: var(--mono);
-  flex-shrink: 0;
-}
-.login-brand-name {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--slate-900);
-  letter-spacing: -.3px;
-}
-.login-brand-name small {
-  display: block;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-3);
-  letter-spacing: .02em;
-  margin-top: -2px;
-}
-.login-sep {
-  height: 1px;
-  background: var(--border);
-  margin: 24px 0;
-}
-.login-label {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 6px;
-  letter-spacing: .02em;
-}
-.login-input {
-  width: 100%;
-  padding: 9px 13px;
-  background: var(--bg-sub);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--font);
-  font-size: 13px;
-  color: var(--text);
-  outline: none;
-  transition: border-color .15s, box-shadow .15s;
-  margin-bottom: 14px;
-}
-.login-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(29,99,237,.1);
-  background: #fff;
-}
-.login-hint {
-  font-size: 11px;
-  color: var(--text-3);
-  margin-top: -10px;
-  margin-bottom: 14px;
-  font-family: var(--mono);
-}
-.login-btn {
-  width: 100%;
-  padding: 11px;
-  background: var(--primary);
-  color: #fff;
-  font-family: var(--font);
-  font-size: 13.5px;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background .15s, box-shadow .15s, transform .08s;
-  letter-spacing: .01em;
-  margin-top: 4px;
-}
-.login-btn:hover { background: var(--primary-h); box-shadow: 0 4px 12px rgba(29,99,237,.3); }
-.login-btn:active { transform: scale(.99); }
-.login-error {
-  display: none;
-  margin-top: 14px;
-  padding: 10px 13px;
-  background: var(--red-50);
-  border: 1px solid #FECACA;
-  border-radius: var(--radius);
-  color: var(--red-600);
-  font-size: 12.5px;
-}
-
-/* ══════════════════════════════════════════════
-   LAYOUT DO APP
-══════════════════════════════════════════════ */
-#screen-app { display: none; min-height: 100vh; }
-
-/* ── SIDEBAR ────────────────────────────────────── */
-.sidebar {
-  position: fixed;
-  left: 0; top: 0;
-  width: var(--sidebar-w);
-  height: 100vh;
-  background: var(--bg);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  overflow-y: auto;
-}
-
-.sidebar-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: var(--topbar-h);
-}
-.brand-icon {
-  width: 30px; height: 30px;
-  background: var(--primary);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  font-family: var(--mono);
-  flex-shrink: 0;
-}
-.brand-text { font-size: 13px; font-weight: 700; color: var(--slate-900); letter-spacing: -.2px; line-height: 1.2; }
-.brand-text small { display: block; font-size: 10px; font-weight: 500; color: var(--text-3); letter-spacing: .03em; }
-
-.client-selector {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.client-selector label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  display: block;
-  margin-bottom: 6px;
-}
-.client-selector select {
-  width: 100%;
-  padding: 7px 10px;
-  background: var(--bg-sub);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--font);
-  font-size: 12.5px;
-  color: var(--text);
-  outline: none;
-  cursor: pointer;
-  transition: border-color .15s;
-}
-.client-selector select:focus { border-color: var(--primary); }
-
-.nav-group { padding: 14px 10px 4px; }
-.nav-group-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  padding: 0 8px 6px;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 10px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  color: var(--text-2);
-  font-size: 13px;
-  font-weight: 500;
-  transition: background .12s, color .12s;
-  border: 1.5px solid transparent;
-  text-decoration: none;
-  margin-bottom: 1px;
-}
-.nav-item:hover { background: var(--blue-50); color: var(--blue-700); }
-.nav-item.active {
-  background: var(--blue-50);
-  color: var(--blue-700);
-  border-color: var(--blue-100);
-  font-weight: 600;
-}
-.nav-item .nav-ico {
-  width: 18px;
-  text-align: center;
-  flex-shrink: 0;
-  opacity: .7;
-}
-.nav-item.active .nav-ico { opacity: 1; }
-
-.sidebar-footer {
-  margin-top: auto;
-  padding: 14px 16px;
-  border-top: 1px solid var(--border);
-}
-.wa-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: var(--bg-sub);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-}
-.status-indicator {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--slate-300);
-  flex-shrink: 0;
-}
-.status-indicator.online { background: var(--green-500); box-shadow: 0 0 0 3px rgba(34,197,94,.15); animation: pulse-green 2.5s infinite; }
-@keyframes pulse-green { 0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.15)} 50%{box-shadow:0 0 0 5px rgba(34,197,94,.05)} }
-.wa-status-text { flex: 1; }
-.wa-status-label { font-size: 11.5px; font-weight: 600; color: var(--text-2); }
-.wa-status-num { font-size: 10.5px; color: var(--text-3); font-family: var(--mono); }
-.btn-logout {
-  font-size: 11px;
-  color: var(--text-3);
-  cursor: pointer;
-  margin-top: 10px;
-  display: block;
-  text-align: center;
-  padding: 5px;
-  border-radius: 5px;
-  transition: background .12s, color .12s;
-}
-.btn-logout:hover { background: var(--red-50); color: var(--red-600); }
-
-/* ── CONTEÚDO PRINCIPAL ─────────────────────────── */
-.main-wrap {
-  margin-left: var(--sidebar-w);
-  min-height: 100vh;
-}
-
-.topbar {
-  height: var(--topbar-h);
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 28px;
-  position: sticky; top: 0;
-  z-index: 50;
-}
-.topbar-left { display: flex; align-items: center; gap: 8px; }
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-3); }
-.breadcrumb .sep { color: var(--slate-300); }
-.breadcrumb .current { color: var(--text); font-weight: 600; }
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-
-.content { padding: 28px; }
-
-/* ══════════════════════════════════════════════
-   COMPONENTES
-══════════════════════════════════════════════ */
-
-/* ── PÁGINAS ────────────────────────────────────── */
-.page { display: none; animation: pageIn .22s cubic-bezier(.22,.61,.36,1) both; }
-.page.active { display: block; }
-@keyframes pageIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
-/* ── SEÇÃO HEADER ───────────────────────────────── */
-.section-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -.3px;
-  line-height: 1.3;
-}
-.section-desc { font-size: 13px; color: var(--text-3); margin-top: 3px; }
-
-/* ── STAT CARDS ─────────────────────────────────── */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-.stat-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 20px 22px;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--primary);
-  opacity: 0;
-  transition: opacity .2s;
-}
-.stat-card:hover::before { opacity: 1; }
-.stat-label { font-size: 11.5px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
-.stat-value { font-size: 30px; font-weight: 700; color: var(--text); font-family: var(--mono); letter-spacing: -1px; }
-.stat-sub { font-size: 11.5px; color: var(--text-3); margin-top: 4px; }
-.stat-card.blue .stat-value { color: var(--blue-600); }
-.stat-card.green .stat-value { color: var(--green-600); }
-.stat-card.amber .stat-value { color: var(--amber-600); }
-
-/* ── CARD ───────────────────────────────────────── */
-.card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
-.card-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-.card-body { padding: 20px; }
-
-/* ── BOTÕES ─────────────────────────────────────── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  border: 1.5px solid transparent;
-  font-family: var(--font);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .14s;
-  letter-spacing: .01em;
-  white-space: nowrap;
-}
-.btn:active { transform: scale(.98); }
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-.btn-primary:hover { background: var(--primary-h); border-color: var(--primary-h); box-shadow: 0 3px 10px rgba(29,99,237,.25); }
-.btn-outline {
-  background: #fff;
-  color: var(--text-2);
-  border-color: var(--border-2);
-}
-.btn-outline:hover { background: var(--bg-sub); border-color: var(--slate-400); color: var(--text); }
-.btn-ghost {
-  background: transparent;
-  color: var(--text-3);
-  border-color: transparent;
-}
-.btn-ghost:hover { background: var(--bg-hover); color: var(--text-2); }
-.btn-danger {
-  background: var(--red-50);
-  color: var(--red-600);
-  border-color: #FECACA;
-}
-.btn-danger:hover { background: #FEE2E2; }
-.btn-success {
-  background: var(--green-50);
-  color: var(--green-700);
-  border-color: #BBF7D0;
-}
-.btn-sm { padding: 5px 11px; font-size: 12px; }
-.btn-xs { padding: 3px 9px; font-size: 11.5px; border-radius: 5px; }
-.btn-icon { padding: 7px; border-radius: var(--radius); }
-.btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* ── BADGES ─────────────────────────────────────── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: .02em;
-}
-.badge-blue   { background: var(--blue-50);  color: var(--blue-700);  border: 1px solid var(--blue-100); }
-.badge-green  { background: var(--green-50); color: var(--green-700); border: 1px solid #BBF7D0; }
-.badge-amber  { background: var(--amber-50); color: var(--amber-600); border: 1px solid #FDE68A; }
-.badge-red    { background: var(--red-50);   color: var(--red-600);   border: 1px solid #FECACA; }
-.badge-slate  { background: var(--slate-100);color: var(--slate-600); border: 1px solid var(--border); }
-.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; }
-
-/* ── TABELA ─────────────────────────────────────── */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead tr { border-bottom: 1.5px solid var(--border); }
-th {
-  padding: 10px 16px;
-  text-align: left;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  white-space: nowrap;
-  background: var(--bg-sub);
-}
-th:first-child { border-radius: var(--radius) 0 0 0; }
-th:last-child  { border-radius: 0 var(--radius) 0 0; }
-td {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--text);
-  vertical-align: middle;
-}
-tr:last-child td { border-bottom: none; }
-tbody tr { transition: background .1s; }
-tbody tr:hover td { background: var(--blue-50); }
-.td-mono { font-family: var(--mono); font-size: 12px; color: var(--text-2); }
-.td-muted { color: var(--text-3); font-size: 12px; }
-
-/* ── FORMULÁRIO ─────────────────────────────────── */
-.field { margin-bottom: 16px; }
-.field-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 6px;
-  letter-spacing: .01em;
-}
-.field-hint { font-size: 11.5px; color: var(--text-3); margin-top: 5px; }
-.input, select, textarea {
-  width: 100%;
-  padding: 9px 13px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--font);
-  font-size: 13px;
-  color: var(--text);
-  outline: none;
-  transition: border-color .15s, box-shadow .15s;
-  resize: vertical;
-}
-.input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(29,99,237,.08);
-}
-.input-mono { font-family: var(--mono); font-size: 12.5px; }
-.form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-
-/* ── PROMPT EDITOR ──────────────────────────────── */
-.prompt-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-.chip {
-  padding: 4px 10px;
-  background: var(--blue-50);
-  border: 1px solid var(--blue-100);
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--blue-700);
-  cursor: pointer;
-  transition: all .12s;
-}
-.chip:hover { background: var(--blue-100); border-color: var(--blue-200); }
-.char-count { font-size: 11px; color: var(--text-3); text-align: right; margin-top: 4px; font-family: var(--mono); }
-
-/* ── MODAL ──────────────────────────────────────── */
-.modal-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(15,23,42,.4);
-  backdrop-filter: blur(4px);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  width: 520px;
-  max-height: 88vh;
-  overflow-y: auto;
-  animation: slideUp .22s cubic-bezier(.22,.61,.36,1) both;
-}
-.modal-header {
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.modal-title { font-size: 15px; font-weight: 700; color: var(--text); }
-.modal-close {
-  width: 28px; height: 28px;
-  border: none; background: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-  color: var(--text-3);
-  display: flex; align-items: center; justify-content: center;
-  transition: background .12s, color .12s;
-}
-.modal-close:hover { background: var(--bg-hover); color: var(--text); }
-.modal-body { padding: 20px 24px; }
-.modal-footer {
-  padding: 14px 24px 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  border-top: 1px solid var(--border);
-  background: var(--bg-sub);
-}
-
-/* ── CHAT BUBBLES ───────────────────────────────── */
-.chat-log { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; padding: 4px; }
-.bubble {
-  padding: 9px 13px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  line-height: 1.55;
-  max-width: 78%;
-}
-.bubble-who { font-size: 10.5px; font-weight: 600; color: var(--text-3); margin-bottom: 4px; }
-.bubble.user { background: var(--bg-sub); border: 1px solid var(--border); align-self: flex-start; }
-.bubble.assistant { background: var(--blue-50); border: 1px solid var(--blue-100); align-self: flex-end; }
-.bubble.assistant .bubble-who { color: var(--blue-600); }
-
-/* ── EMPTY STATE ────────────────────────────────── */
-.empty {
-  text-align: center;
-  padding: 48px 20px;
-  color: var(--text-3);
-}
-.empty-icon { font-size: 36px; margin-bottom: 12px; opacity: .5; }
-.empty-title { font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
-.empty-desc { font-size: 12.5px; }
-
-/* ── PRODUTO CARDS ──────────────────────────────── */
-.produto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; margin-bottom: 20px; }
-.produto-card {
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  transition: border-color .15s, box-shadow .15s;
-}
-.produto-card:hover { border-color: var(--blue-200); box-shadow: var(--shadow); }
-.produto-card-name { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; padding-right: 26px; line-height: 1.3; }
-.produto-card-sabor { font-size: 12px; color: var(--text-3); margin-bottom: 12px; }
-.produto-card-footer { display: flex; align-items: flex-end; justify-content: space-between; }
-.produto-card-preco { font-size: 17px; font-weight: 700; color: var(--blue-600); font-family: var(--mono); }
-.produto-card-qty { font-size: 11px; color: var(--text-3); margin-top: 2px; }
-.produto-del {
-  position: absolute; top: 12px; right: 12px;
-  width: 22px; height: 22px;
-  background: none; border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  color: var(--text-3);
-  font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background .12s, color .12s;
-}
-.produto-del:hover { background: var(--red-50); color: var(--red-600); }
-.produto-card-desc { font-size: 11.5px; color: var(--text-3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.5; }
-
-/* ── TABS ───────────────────────────────────────── */
-.tabs { display: flex; gap: 2px; border-bottom: 1.5px solid var(--border); margin-bottom: 20px; }
-.tab {
-  padding: 9px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1.5px;
-  transition: color .12s, border-color .12s;
-}
-.tab.active { color: var(--blue-600); border-color: var(--blue-600); font-weight: 600; }
-.tab:hover { color: var(--text); }
-
-/* ── DIVIDER ────────────────────────────────────── */
-.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-/* ── ALERT ──────────────────────────────────────── */
-.alert {
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.alert-info  { background: var(--blue-50);  border: 1px solid var(--blue-100);  color: var(--blue-900); }
-.alert-warn  { background: var(--amber-50); border: 1px solid #FDE68A; color: #78350F; }
-.alert-icon { flex-shrink: 0; font-size: 15px; }
-
-/* ── TOAST ──────────────────────────────────────── */
-#toast {
-  position: fixed;
-  bottom: 24px; right: 24px;
-  background: var(--slate-900);
-  color: #fff;
-  padding: 11px 18px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: var(--shadow-lg);
-  transform: translateY(80px);
-  opacity: 0;
-  transition: all .22s cubic-bezier(.22,.61,.36,1);
-  z-index: 999;
-  max-width: 340px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-#toast.show { transform: translateY(0); opacity: 1; }
-#toast.success::before { content: '✓'; display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: var(--green-500); border-radius: 50%; font-size: 11px; flex-shrink: 0; }
-#toast.error::before   { content: '✕'; display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: var(--red-500); border-radius: 50%; font-size: 11px; flex-shrink: 0; }
-
-/* ── INLINE LOADING ─────────────────────────────── */
-.loading-row { padding: 32px; text-align: center; color: var(--text-3); font-size: 13px; }
-.spinner {
-  display: inline-block;
-  width: 16px; height: 16px;
-  border: 2px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin .6s linear infinite;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── CODE BLOCK ─────────────────────────────────── */
-pre {
-  background: var(--slate-900);
-  color: #93C5FD;
-  font-family: var(--mono);
-  font-size: 12px;
-  padding: 16px;
-  border-radius: var(--radius);
-  overflow-x: auto;
-  line-height: 1.7;
-  margin: 10px 0;
-}
-code {
-  font-family: var(--mono);
-  font-size: 12px;
-  background: var(--slate-100);
-  color: var(--blue-700);
-  padding: 1px 6px;
-  border-radius: 4px;
-}
-
-/* ── GUIA HOSPEDAGEM ─────────────────────────────── */
-.guide-step { display: flex; gap: 16px; margin-bottom: 24px; }
-.guide-step:last-child { margin-bottom: 0; }
-.step-num {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.step-body { flex: 1; }
-.step-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.step-desc { font-size: 13px; color: var(--text-2); line-height: 1.7; }
-.step-sep { border: none; border-left: 1.5px dashed var(--border); height: 16px; width: 0; margin-left: 14px; margin-bottom: 0; }
-
-/* ── MISC ───────────────────────────────────────── */
-.required { color: var(--red-500); margin-left: 2px; }
-.flex { display: flex; }
-.flex-between { display: flex; align-items: center; justify-content: space-between; }
-.flex-center  { display: flex; align-items: center; }
-.gap-8  { gap: 8px; }
-.gap-12 { gap: 12px; }
-.mt-16 { margin-top: 16px; }
-.text-muted { color: var(--text-3); }
-.text-sm { font-size: 12px; }
+/* PAIRING CODE */
+.pair-code{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--primary);letter-spacing:8px;text-align:center;padding:20px;background:var(--blue-50);border:2px dashed var(--blue-200);border-radius:var(--rl);margin:16px 0}
+.pair-steps{list-style:none;counter-reset:step}
+.pair-steps li{counter-increment:step;display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-2)}
+.pair-steps li:last-child{border-bottom:none}
+.pair-steps li::before{content:counter(step);width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.conn-status{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:var(--r);border:1.5px solid var(--border);margin-bottom:16px;font-size:13px;font-weight:500}
+.conn-status.connected{background:var(--green-50);border-color:#BBF7D0;color:var(--green-700)}
+.conn-status.waiting{background:var(--amber-50);border-color:#FDE68A;color:var(--amber-600)}
+.conn-status.error{background:var(--red-50);border-color:#FECACA;color:var(--red-600)}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══════════════════════════════════════════════════ -->
-<div id="screen-login">
-  <div class="login-card">
-    <div class="login-brand">
-      <div class="login-brand-icon">AI</div>
-      <div class="login-brand-name">
-        Agents Intelligence
-        <small>MANAGEMENT PORTAL</small>
-      </div>
-    </div>
-    <div class="login-sep"></div>
-
-    <label class="login-label">URL da API <span class="required">*</span></label>
-    <input class="login-input input-mono" id="i-url" type="text" value="http://localhost:3000" placeholder="http://localhost:3000">
-    <div class="login-hint">Em produção: https://seu-app.railway.app</div>
-
-    <label class="login-label">Usuário <span class="required">*</span></label>
-    <input class="login-input" id="i-user" type="text" placeholder="Admin" onkeydown="if(event.key==='Enter')doLogin()">
-
-    <label class="login-label">Senha <span class="required">*</span></label>
-    <input class="login-input" id="i-pass" type="password" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-
-    <button class="login-btn" onclick="doLogin()">Acessar painel</button>
-    <div id="login-error" class="login-error">Usuário ou senha incorretos.</div>
+<!-- LOGIN -->
+<div id="sl">
+  <div class="lc">
+    <div class="lb"><div class="li">AI</div><div class="ln">Agents Intelligence <small>MANAGEMENT PORTAL</small></div></div>
+    <div class="lsep"></div>
+    <label class="fl">URL da API <span class="req">*</span></label>
+    <input class="fi im" id="i-url" type="text" value="http://localhost:3000" placeholder="http://localhost:3000 ou https://xxx.railway.app">
+    <p class="fh">Em produção use a URL do Railway</p>
+    <label class="fl">Chave de acesso (ADMIN_SECRET) <span class="req">*</span></label>
+    <input class="fi" id="i-sec" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Acessar painel →</button>
+    <div id="lerr" class="lerr">Credenciais inválidas ou API inacessível.</div>
   </div>
 </div>
 
-<!-- ══ APP ════════════════════════════════════════════════════ -->
-<div id="screen-app">
-  <!-- SIDEBAR -->
+<!-- APP -->
+<div id="sa">
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="brand-icon">AI</div>
-      <div class="brand-text">Agents Intelligence <small>MANAGEMENT PORTAL</small></div>
+    <div class="sh"><div class="bi">AI</div><div class="bt">Agents Intelligence <small>MANAGEMENT PORTAL</small></div></div>
+    <div class="cs"><label>Cliente / Loja ativa</label><select id="sel-loja" onchange="onTrocar()"><option>Carregando...</option></select></div>
+    <div class="ng">
+      <div class="ngl">Visão Geral</div>
+      <div class="ni active" onclick="gp('dashboard',this)"><span class="ico">◈</span>Dashboard</div>
     </div>
-
-    <div class="client-selector">
-      <label>Cliente / Loja ativa</label>
-      <select id="sel-loja" onchange="onTrocarLoja()">
-        <option value="">Carregando...</option>
-      </select>
+    <div class="ng">
+      <div class="ngl">Operação</div>
+      <div class="ni" onclick="gp('agente',this)"><span class="ico">✦</span>Agente & Prompt</div>
+      <div class="ni" onclick="gp('produtos',this)"><span class="ico">▣</span>Catálogo de Produtos</div>
+      <div class="ni" onclick="gp('pedidos',this)"><span class="ico">◎</span>Pedidos</div>
+      <div class="ni" onclick="gp('conversas',this)"><span class="ico">◷</span>Conversas</div>
     </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">Visão Geral</div>
-      <div class="nav-item active" onclick="goPage('dashboard',this)">
-        <span class="nav-ico">◈</span> Dashboard
-      </div>
+    <div class="ng">
+      <div class="ngl">Configuração</div>
+      <div class="ni" onclick="gp('conexao',this)"><span class="ico">📱</span>Conexão WhatsApp</div>
+      <div class="ni" onclick="gp('clientes',this)"><span class="ico">⊞</span>Gerenciar Clientes</div>
     </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">Operação</div>
-      <div class="nav-item" onclick="goPage('agente',this)">
-        <span class="nav-ico">✦</span> Agente & Prompt
-      </div>
-      <div class="nav-item" onclick="goPage('produtos',this)">
-        <span class="nav-ico">▣</span> Catálogo de Produtos
-      </div>
-      <div class="nav-item" onclick="goPage('pedidos',this)">
-        <span class="nav-ico">◎</span> Pedidos
-      </div>
-      <div class="nav-item" onclick="goPage('conversas',this)">
-        <span class="nav-ico">◷</span> Conversas
-      </div>
-    </div>
-
-    <div class="nav-group">
-      <div class="nav-group-label">Configuração</div>
-      <div class="nav-item" onclick="goPage('clientes',this)">
-        <span class="nav-ico">⊞</span> Gerenciar Clientes
-      </div>
-      <div class="nav-item" onclick="goPage('hospedagem',this)">
-        <span class="nav-ico">☁</span> Guia de Hospedagem
-      </div>
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="wa-status">
-        <div class="status-indicator" id="status-dot"></div>
-        <div class="wa-status-text">
-          <div class="wa-status-label" id="status-label">Verificando...</div>
-          <div class="wa-status-num" id="status-num"></div>
-        </div>
-      </div>
-      <span class="btn-logout" onclick="doLogout()">Sair do painel</span>
+    <div class="sf">
+      <div class="ws"><div class="sd" id="sdot"></div><div style="flex:1"><div class="wl" id="slbl">Verificando...</div><div class="wn" id="snum"></div></div></div>
+      <span class="blo" onclick="doLogout()">Sair do painel</span>
     </div>
   </aside>
 
-  <!-- MAIN -->
-  <div class="main-wrap">
+  <div class="mw">
     <header class="topbar">
-      <div class="topbar-left">
-        <div class="breadcrumb">
-          <span>Agents Intelligence</span>
-          <span class="sep">/</span>
-          <span class="current" id="topbar-page">Dashboard</span>
-        </div>
-      </div>
-      <div class="topbar-right">
-        <span class="text-muted text-sm" id="topbar-loja"></span>
-        <button class="btn btn-outline btn-sm" onclick="refreshPage()">↻ Atualizar</button>
+      <div class="bc"><span>Agents Intelligence</span><span class="sep">/</span><span class="cur" id="tp-page">Dashboard</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--text-3)" id="tp-loja"></span>
+        <button class="btn btn-o btn-sm" onclick="refreshPage()">↻ Atualizar</button>
       </div>
     </header>
-
     <div class="content">
 
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: DASHBOARD
-      ───────────────────────────────────────────── -->
+      <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
-        <div class="section-head">
-          <div>
-            <div class="section-title" id="dash-title">Dashboard</div>
-            <div class="section-desc">Visão geral da operação do agente</div>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="loadDashboard()">↻ Atualizar dados</button>
+        <div class="seh"><div><div class="set" id="dash-title">Dashboard</div><div class="sed">Visão geral da operação</div></div><button class="btn btn-o btn-sm" onclick="loadDashboard()">↻</button></div>
+        <div class="sg">
+          <div class="sc blue"><div class="sl2">Conversas hoje</div><div class="sv" id="s-conv">—</div><div class="ss">mensagens 24h</div></div>
+          <div class="sc amber"><div class="sl2">Pedidos pendentes</div><div class="sv" id="s-ped">—</div><div class="ss">aguardando confirmação</div></div>
+          <div class="sc green"><div class="sl2">Produtos ativos</div><div class="sv" id="s-prod">—</div><div class="ss">no catálogo</div></div>
+          <div class="sc"><div class="sl2">WhatsApp</div><div class="sv" id="s-wa" style="font-size:14px;margin-top:4px">—</div><div class="ss" id="s-wa-n"></div></div>
         </div>
-
-        <div class="stats-grid">
-          <div class="stat-card blue">
-            <div class="stat-label">Conversas hoje</div>
-            <div class="stat-value" id="s-conv">—</div>
-            <div class="stat-sub">mensagens recebidas 24h</div>
-          </div>
-          <div class="stat-card amber">
-            <div class="stat-label">Pedidos pendentes</div>
-            <div class="stat-value" id="s-ped">—</div>
-            <div class="stat-sub">aguardando confirmação</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-label">Produtos ativos</div>
-            <div class="stat-value" id="s-prod">—</div>
-            <div class="stat-sub">no catálogo do agente</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">WhatsApp</div>
-            <div class="stat-value" id="s-wa" style="font-size:14px;margin-top:4px">—</div>
-            <div class="stat-sub" id="s-wa-num"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Últimos pedidos registrados</div>
-              <div class="card-desc">Detectados automaticamente pelo agente nas conversas</div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="goPage('pedidos',document.querySelector('.nav-item:nth-child(3)'))">Ver todos →</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th><th>Data</th></tr>
-              </thead>
-              <tbody id="dash-pedidos-tbody">
-                <tr><td colspan="5" class="loading-row"><span class="spinner"></span>Carregando...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <div class="card"><div class="ch"><div><div class="ct">Últimos pedidos</div><div class="cd">Detectados pelo agente</div></div><button class="btn btn-g btn-sm" onclick="gp('pedidos',null)">Ver todos →</button></div><div class="tw"><table><thead><tr><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th><th>Data</th></tr></thead><tbody id="dp-tbody"><tr><td colspan="5" class="lr"><span class="spin"></span>Carregando...</td></tr></tbody></table></div></div>
       </div>
 
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: AGENTE & PROMPT
-      ───────────────────────────────────────────── -->
+      <!-- AGENTE -->
       <div class="page" id="page-agente">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Agente & Prompt</div>
-            <div class="section-desc">Configure a personalidade, regras e comportamento do agente para este cliente</div>
-          </div>
-          <button class="btn btn-primary" onclick="salvarAgente()">Salvar configuração</button>
-        </div>
-
+        <div class="seh"><div><div class="set">Agente & Prompt</div><div class="sed">Personalidade, regras e comportamento</div></div><button class="btn btn-p" onclick="salvarAgente()">Salvar configuração</button></div>
         <div class="card" style="margin-bottom:20px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Personalidade e objetivos</div>
-              <div class="card-desc">Define quem o agente é e como ele se comunica</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="field">
-              <label class="field-label">Prompt principal — Personalidade <span class="required">*</span></label>
-              <div class="prompt-chips">
-                <span class="chip" onclick="addChip('a-prompt','Você é [NOME], atendente simpático e direto da [LOJA]. Use linguagem jovem e descontraída.')">＋ Base inicial</span>
-                <span class="chip" onclick="addChip('a-prompt','Quando o cliente demonstrar interesse, apresente o preço e a disponibilidade imediatamente.')">＋ Apresentar preço</span>
-                <span class="chip" onclick="addChip('a-prompt','Se o cliente hesitar, ofereça desconto de 5% para pagamento via Pix.')">＋ Desconto Pix</span>
-                <span class="chip" onclick="addChip('a-prompt','Sempre pergunte o nome do cliente no início da primeira conversa.')">＋ Pedir nome</span>
-                <span class="chip" onclick="addChip('a-prompt','Seja formal, profissional e focado em resultados. Evite gírias.')">＋ Tom formal</span>
-                <span class="chip" onclick="addChip('a-prompt','Use emojis com moderação para tornar a conversa mais amigável.')">＋ Emojis leves</span>
+          <div class="ch"><div><div class="ct">Personalidade</div><div class="cd">Como o agente fala e se comporta</div></div></div>
+          <div class="cb">
+            <div class="field"><label class="fll">Prompt principal (prompt_base) <span class="req">*</span></label>
+              <div class="chips">
+                <span class="chip" onclick="addChip('a-p','Você é [NOME], atendente da [LOJA]. Use linguagem jovem e animada.')">＋ Base inicial</span>
+                <span class="chip" onclick="addChip('a-p','Quando o cliente perguntar sobre produto, informe preço e estoque imediatamente.')">＋ Apresentar preço</span>
+                <span class="chip" onclick="addChip('a-p','Se o cliente hesitar, ofereça 5% de desconto no Pix.')">＋ Desconto Pix</span>
+                <span class="chip" onclick="addChip('a-p','Pergunte o nome do cliente logo na primeira mensagem.')">＋ Pedir nome</span>
+                <span class="chip" onclick="addChip('a-p','Seja formal, profissional e objetivo. Sem emojis.')">＋ Tom formal</span>
               </div>
-              <textarea class="input" id="a-prompt" rows="5" placeholder="Descreva quem é o agente, como ele fala, qual é o foco do negócio..." oninput="cc('a-prompt','cc-prompt')"></textarea>
-              <div class="char-count" id="cc-prompt">0 caracteres</div>
+              <textarea class="input" id="a-p" rows="6" placeholder="Descreva quem é o agente..." oninput="cc('a-p','cc-p')"></textarea>
+              <div class="cct" id="cc-p">0 caracteres</div>
             </div>
-
-            <div class="field">
-              <label class="field-label">Instruções operacionais</label>
-              <div class="prompt-chips">
-                <span class="chip" onclick="addChip('a-inst','Horário de atendimento: segunda a sábado, das 9h às 22h.')">＋ Horário</span>
-                <span class="chip" onclick="addChip('a-inst','Entregamos em: [CIDADES]. Fora dessas regiões, consultar.')">＋ Área de entrega</span>
-                <span class="chip" onclick="addChip('a-inst','Formas de pagamento: Pix (5% desconto), débito, dinheiro na entrega. Não aceitamos crédito.')">＋ Pagamento</span>
-                <span class="chip" onclick="addChip('a-inst','Pedido mínimo: R$ 50,00.')">＋ Pedido mínimo</span>
-                <span class="chip" onclick="addChip('a-inst','Prazo de entrega: até 2 horas para pedidos feitos antes das 20h.')">＋ Prazo entrega</span>
-                <span class="chip" onclick="addChip('a-inst','Não divulgar dados de outros clientes ou informações internas da loja.')">＋ Privacidade</span>
+            <div class="field"><label class="fll">Instruções operacionais (instrucoes_extras)</label>
+              <div class="chips">
+                <span class="chip" onclick="addChip('a-i','Horário: segunda a sábado, 9h às 22h.')">＋ Horário</span>
+                <span class="chip" onclick="addChip('a-i','Entregamos em: [CIDADES].')">＋ Entrega</span>
+                <span class="chip" onclick="addChip('a-i','Pagamento: Pix com 5% desconto, débito ou dinheiro.')">＋ Pagamento</span>
+                <span class="chip" onclick="addChip('a-i','Pedido mínimo: R$ 50,00.')">＋ Pedido mínimo</span>
+                <span class="chip" onclick="addChip('a-i','Prazo: até 2h para pedidos antes das 20h.')">＋ Prazo</span>
               </div>
-              <textarea class="input" id="a-inst" rows="4" placeholder="Regras do negócio: horário, entrega, pagamento, promoções vigentes..." oninput="cc('a-inst','cc-inst')"></textarea>
-              <div class="char-count" id="cc-inst">0 caracteres</div>
-              <div class="field-hint">Essas instruções são injetadas no contexto do agente a cada mensagem. Alterar aqui reflete imediatamente — sem precisar reiniciar o servidor.</div>
+              <textarea class="input" id="a-i" rows="4" placeholder="Horário, pagamento, entrega..." oninput="cc('a-i','cc-i')"></textarea>
+              <div class="cct" id="cc-i">0 caracteres</div>
+              <div class="fhi">Efeito imediato — sem reiniciar o servidor.</div>
             </div>
           </div>
         </div>
-
         <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Testar o agente</div>
-              <div class="card-desc">Simule uma conversa de cliente sem usar o WhatsApp real</div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('chat-test').innerHTML='<div class=empty><div class=empty-icon>💬</div><div class=empty-title>Envie uma mensagem</div></div>'">Limpar</button>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:16px">
-              <span class="alert-icon">ℹ</span>
-              <span>O teste usa o endpoint <code>POST /simulate</code> do seu servidor. Certifique-se de que o servidor está rodando e que o <code>ADMIN_SECRET</code> no HTML bate com o do <code>.env</code>.</span>
-            </div>
-            <div id="chat-test" class="chat-log" style="min-height:120px;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;background:var(--bg-sub);margin-bottom:14px">
-              <div class="empty"><div class="empty-icon">💬</div><div class="empty-title">Pronto para testar</div><div class="empty-desc">Digite abaixo para simular um cliente</div></div>
-            </div>
-            <div class="flex gap-8">
-              <input type="text" class="input" id="i-test" placeholder="Mensagem do cliente simulado..." onkeydown="if(event.key==='Enter')doTest()">
-              <button class="btn btn-primary" onclick="doTest()">Enviar</button>
-            </div>
+          <div class="ch"><div><div class="ct">Testar o agente</div><div class="cd">Simule sem usar WhatsApp real</div></div><button class="btn btn-g btn-sm" onclick="limT()">Limpar</button></div>
+          <div class="cb">
+            <div id="ct" class="cl" style="min-height:120px;border:1.5px solid var(--border);border-radius:var(--r);padding:14px;background:var(--bg-sub);margin-bottom:14px"><div class="empty"><div class="ei">💬</div><div class="etit">Pronto para testar</div></div></div>
+            <div style="display:flex;gap:8px"><input type="text" class="input" id="i-t" placeholder="Mensagem do cliente..." onkeydown="if(event.key==='Enter')doTest()"><button class="btn btn-p" onclick="doTest()">Enviar</button></div>
           </div>
         </div>
       </div>
 
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: PRODUTOS
-      ───────────────────────────────────────────── -->
+      <!-- PRODUTOS -->
       <div class="page" id="page-produtos">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Catálogo de Produtos</div>
-            <div class="section-desc">O agente consulta este catálogo em tempo real a cada mensagem</div>
-          </div>
-          <button class="btn btn-primary" onclick="openModal('modal-produto')">＋ Adicionar produto</button>
-        </div>
-
-        <div class="alert alert-info">
-          <span class="alert-icon">ℹ</span>
-          <span><strong>Como funciona:</strong> A cada mensagem recebida, o agente busca a lista de produtos atualizada aqui e inclui no contexto. Você pode adicionar, editar ou remover produtos a qualquer momento — não precisa reiniciar nada.</span>
-        </div>
-
-        <div id="produto-grid" class="produto-grid"></div>
+        <div class="seh"><div><div class="set">Catálogo de Produtos</div><div class="sed">O agente consulta em tempo real a cada mensagem</div></div><button class="btn btn-p" onclick="openMo('mp')">＋ Adicionar</button></div>
+        <div class="alert a-i"><span class="ai">ℹ</span><span>Adicione ou remova produtos aqui — o agente usa na próxima mensagem. Não precisa reiniciar.</span></div>
+        <div id="pgrid" class="pg"></div>
       </div>
 
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: PEDIDOS
-      ───────────────────────────────────────────── -->
+      <!-- PEDIDOS -->
       <div class="page" id="page-pedidos">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Gestão de Pedidos</div>
-            <div class="section-desc">Pedidos detectados automaticamente nas conversas do WhatsApp</div>
-          </div>
-          <div class="flex gap-8">
-            <select class="input" id="filter-pedido" style="width:auto" onchange="loadPedidos()">
-              <option value="">Todos os status</option>
-              <option value="Pendente">Pendentes</option>
-              <option value="Confirmado">Confirmados</option>
-              <option value="Entregue">Entregues</option>
-              <option value="Cancelado">Cancelados</option>
-            </select>
-            <button class="btn btn-outline btn-sm" onclick="loadPedidos()">↻</button>
-          </div>
+        <div class="seh"><div><div class="set">Gestão de Pedidos</div><div class="sed">Detectados automaticamente nas conversas</div></div>
+          <div style="display:flex;gap:8px"><select class="input" id="fp" style="width:auto" onchange="loadPedidos()"><option value="">Todos</option><option value="Pendente">Pendentes</option><option value="Confirmado">Confirmados</option><option value="Entregue">Entregues</option><option value="Cancelado">Cancelados</option></select><button class="btn btn-o btn-sm" onclick="loadPedidos()">↻</button></div>
         </div>
-
-        <div class="card">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Itens</th>
-                  <th>Total</th>
-                  <th>Pagamento</th>
-                  <th>Status</th>
-                  <th>Data</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody id="pedidos-tbody">
-                <tr><td colspan="7" class="loading-row"><span class="spinner"></span>Selecione um cliente para ver pedidos</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Itens</th><th>Total</th><th>Pagamento</th><th>Status</th><th>Data</th><th>Ação</th></tr></thead><tbody id="ptb"><tr><td colspan="7" class="lr"><span class="spin"></span>Selecione um cliente</td></tr></tbody></table></div></div>
       </div>
 
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: CONVERSAS
-      ───────────────────────────────────────────── -->
+      <!-- CONVERSAS -->
       <div class="page" id="page-conversas">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Histórico de Conversas</div>
-            <div class="section-desc">Acompanhe todos os atendimentos realizados pelo agente</div>
-          </div>
-        </div>
+        <div class="seh"><div><div class="set">Histórico de Conversas</div><div class="sed">Todos os atendimentos do agente</div></div></div>
         <div style="display:grid;grid-template-columns:250px 1fr;gap:18px">
           <div class="card" style="padding:0;overflow:hidden">
             <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em">Contatos</div>
-            <div id="contatos-list" style="overflow-y:auto;max-height:500px">
-              <div class="loading-row"><span class="spinner"></span>Carregando...</div>
-            </div>
+            <div id="clist" style="overflow-y:auto;max-height:520px"><div class="lr"><span class="spin"></span>Carregando...</div></div>
           </div>
           <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title" id="conv-title">Selecione um contato</div>
-              </div>
-              <button class="btn btn-danger btn-sm" id="btn-clear-conv" style="display:none" onclick="clearConv()">Limpar histórico</button>
-            </div>
-            <div class="card-body">
-              <div id="chat-conv" class="chat-log" style="min-height:200px;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;background:var(--bg-sub)">
-                <div class="empty"><div class="empty-icon">◷</div><div class="empty-title">Nenhum contato selecionado</div></div>
-              </div>
-            </div>
+            <div class="ch"><div><div class="ct" id="ctit">Selecione um contato</div></div><button class="btn btn-d btn-sm" id="bcc" style="display:none" onclick="clrConv()">Limpar histórico</button></div>
+            <div class="cb"><div id="cconv" class="cl" style="min-height:200px;border:1.5px solid var(--border);border-radius:var(--r);padding:14px;background:var(--bg-sub)"><div class="empty"><div class="ei">◷</div><div class="etit">Selecione um contato</div></div></div></div>
           </div>
         </div>
       </div>
 
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: CLIENTES / LOJAS
-      ───────────────────────────────────────────── -->
-      <div class="page" id="page-clientes">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Gerenciar Clientes</div>
-            <div class="section-desc">Cada cliente = um número de WhatsApp com agente independente</div>
-          </div>
-          <button class="btn btn-primary" onclick="openModal('modal-loja')">＋ Novo cliente</button>
+      <!-- CONEXÃO WHATSAPP -->
+      <div class="page" id="page-conexao">
+        <div class="seh"><div><div class="set">Conexão WhatsApp</div><div class="sed">Conecte um número sem precisar de QR Code — funciona no Railway</div></div></div>
+
+        <div class="alert a-i" style="margin-bottom:20px">
+          <span class="ai">💡</span>
+          <span><strong>Pairing Code:</strong> em vez de escanear um QR, você recebe um código de 8 letras e digita no WhatsApp. Funciona perfeitamente no Railway onde o QR não renderiza.</span>
         </div>
 
+        <!-- Status atual -->
         <div class="card" style="margin-bottom:20px">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Nome / Empresa</th><th>Número WhatsApp</th><th>Status</th><th>Ações</th></tr>
-              </thead>
-              <tbody id="lojas-tbody">
-                <tr><td colspan="4" class="loading-row"><span class="spinner"></span>Carregando...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card" style="border-color:var(--blue-200);background:var(--blue-50)">
-          <div class="card-body">
-            <div style="font-size:14px;font-weight:700;color:var(--blue-700);margin-bottom:8px">Como funciona o multi-cliente</div>
-            <div style="font-size:13px;color:var(--blue-900);line-height:1.8">
-              Cada cliente cadastrado tem seu próprio número de WhatsApp e prompt personalizado. O agente identifica de qual loja veio a mensagem pelo número conectado e usa a configuração correta automaticamente — sem intervenção manual.<br><br>
-              Para conectar um segundo número: cadastre o cliente aqui e rode outra instância do servidor com o novo número escaneado no QR Code.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ─────────────────────────────────────────────
-           PÁGINA: HOSPEDAGEM
-      ───────────────────────────────────────────── -->
-      <div class="page" id="page-hospedagem">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Guia de Hospedagem</div>
-            <div class="section-desc">Mantenha o agente online 24/7 sem depender do seu computador</div>
-          </div>
-        </div>
-
-        <div class="card" style="border-color:#FDE68A;background:var(--amber-50);margin-bottom:20px">
-          <div class="card-body">
-            <div style="font-size:14px;font-weight:700;color:#92400E;margin-bottom:6px">⚡ Por que hospedar?</div>
-            <div style="font-size:13px;color:#78350F;line-height:1.8">
-              Rodando no seu computador, o agente para quando você fecha o PC, perde internet ou reinicia. Com o <strong>Railway</strong> (gratuito para começar com $5/mês de crédito), ele roda em nuvem — 24 horas por dia, 7 dias por semana, atendendo clientes mesmo quando você dorme.
+          <div class="ch"><div><div class="ct">Status da conexão</div></div><button class="btn btn-o btn-sm" onclick="checkConnStatus()">↻ Verificar</button></div>
+          <div class="cb">
+            <div id="conn-status-box" class="conn-status waiting"><span class="spin"></span>Verificando...</div>
+            <div id="pairing-display" style="display:none">
+              <div style="font-size:13px;color:var(--text-2);margin-bottom:8px;font-weight:500">Digite este código no WhatsApp:</div>
+              <div class="pair-code" id="pair-code-val">----</div>
+              <ol class="pair-steps">
+                <li>Abra o WhatsApp no celular do número que vai atender clientes</li>
+                <li>Toque nos 3 pontinhos (menu) → <strong>Aparelhos conectados</strong></li>
+                <li>Toque em <strong>"Vincular um aparelho"</strong></li>
+                <li>Escolha <strong>"Vincular com número de telefone"</strong></li>
+                <li>Digite o código acima — ele expira em 60 segundos</li>
+              </ol>
             </div>
           </div>
         </div>
 
-        <div class="tabs">
-          <div class="tab active" onclick="switchTab(this,'tab-railway')">Railway (Recomendado)</div>
-          <div class="tab" onclick="switchTab(this,'tab-vps')">VPS / Servidor próprio</div>
-          <div class="tab" onclick="switchTab(this,'tab-extras')">Arquivos extras</div>
-        </div>
-
-        <div id="tab-railway" class="tab-content card">
-          <div class="card-body">
-            <div class="guide-step">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <div class="step-title">Subir o código no GitHub</div>
-                <div class="step-desc">Crie um repositório <strong>privado</strong> em github.com e execute no terminal:</div>
-                <pre>cd seu-projeto
-git init
-git add .
-git commit -m "deploy inicial"
-
-# Cole a URL do repositório GitHub aqui:
-git remote add origin https://github.com/SEU_USUARIO/agents-agent.git
-git branch -M main
-git push -u origin main</pre>
-                <div class="step-desc" style="margin-top:10px">⚠️ Confirme que <code>.gitignore</code> inclui <code>.env</code> e <code>auth_info_baileys/</code></div>
-              </div>
+        <!-- Conectar novo número -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="ch"><div><div class="ct">Conectar número via Pairing Code</div><div class="cd">Use para novo número ou após logout</div></div></div>
+          <div class="cb">
+            <div class="field">
+              <label class="fll">Número do WhatsApp <span class="req">*</span></label>
+              <input type="text" class="input im" id="conn-num" placeholder="5511958438636">
+              <div class="fhi">Apenas números com DDI (55) + DDD + número. Sem + ou espaços.</div>
             </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <div class="step-title">Criar projeto no Railway</div>
-                <div class="step-desc">Acesse <strong>railway.app</strong> → Login with GitHub → <em>New Project</em> → <em>Deploy from GitHub repo</em> → selecione o repositório. O Railway detecta <code>npm start</code> automaticamente.</div>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <div class="step-title">Configurar variáveis de ambiente</div>
-                <div class="step-desc">Railway → seu projeto → aba <em>Variables</em> → adicione cada uma:</div>
-                <pre>GROQ_API_KEY         → sua chave do Groq (console.groq.com)
-SUPABASE_URL         → URL do projeto Supabase
-SUPABASE_SERVICE_KEY → chave service_role (não a anon!)
-ADMIN_SECRET         → senha para este painel
-PORT                 → 3000</pre>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <div class="step-title">Criar volume persistente (OBRIGATÓRIO)</div>
-                <div class="step-desc">Sem isso, toda vez que o Railway reiniciar o servidor, o WhatsApp vai desconectar e você precisará escanear o QR de novo.</div>
-                <div class="step-desc" style="margin-top:8px"><strong>Railway → seu projeto → New Volume → Mount path:</strong> <code>/app/auth_info_baileys</code></div>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">5</div>
-              <div class="step-body">
-                <div class="step-title">Escanear o QR Code nos logs</div>
-                <div class="step-desc">Após o deploy (2-3 minutos), acesse: Railway → seu projeto → <em>View Logs</em>. O QR Code aparece ali. Escaneie com o WhatsApp do número que vai atender os clientes. Feito isso, não precisa mais repetir.</div>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">6</div>
-              <div class="step-body">
-                <div class="step-title">Conectar este painel ao Railway</div>
-                <div class="step-desc">Railway → Settings → Networking → <em>Generate Domain</em>. Você receberá uma URL como <code>https://agents-xxxx.railway.app</code>. Use essa URL no campo "URL da API" ao abrir este painel.</div>
-              </div>
-            </div>
+            <button class="btn btn-p" id="btn-connect" onclick="doConnect()">Gerar código de vinculação →</button>
+            <div id="conn-msg" style="margin-top:14px;font-size:13px;color:var(--text-3)"></div>
           </div>
         </div>
 
-        <div id="tab-vps" class="tab-content card" style="display:none">
-          <div class="card-body">
-            <div class="guide-step">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <div class="step-title">Contratar um servidor (VPS)</div>
-                <div class="step-desc">Opções baratas no Brasil: Hostinger VPS (~R$25/mês), DigitalOcean Droplet ($6/mês), Hetzner (~€3.79/mês). Escolha Ubuntu 22.04.</div>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <div class="step-title">Instalar Node.js e PM2</div>
-                <pre># Conecte via SSH e rode:
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs git
-npm install -g pm2</pre>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <div class="step-title">Subir o projeto e iniciar com PM2</div>
-                <pre>git clone https://github.com/SEU_USUARIO/agents-agent.git
-cd agents-agent
-npm install
-cp .env.example .env
-nano .env          # preencha as variáveis
-
-# Inicia e mantém rodando para sempre:
-pm2 start npm --name "agents" -- start
-pm2 save
-pm2 startup        # siga as instruções exibidas</pre>
-              </div>
-            </div>
-            <hr class="divider">
-            <div class="guide-step">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <div class="step-title">Ver logs e escanear QR</div>
-                <pre>pm2 logs agents    # QR Code aparece aqui na primeira vez
-
-# Comandos úteis:
-pm2 restart agents
-pm2 stop agents
-pm2 status</pre>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="tab-extras" class="tab-content card" style="display:none">
-          <div class="card-body">
-            <div class="section-title" style="font-size:15px;margin-bottom:16px">Arquivos extras para o painel funcionar 100%</div>
-
-            <div style="font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--text-2)">1. Adicione ao seu <code>index.js</code> (após as outras rotas):</div>
-            <pre>// CORS — permite que o painel HTML acesse de outra origem
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Content-Type, x-admin-secret')
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS')
-  if (req.method === 'OPTIONS') return res.sendStatus(200)
-  next()
-})
-
-// Rota de conversas
-import conversasRouter from './routes/conversas.js'
-app.use('/admin/conversas', adminAuth, conversasRouter)
-
-// Rota de simulação (para o painel testar o agente)
-import { responderAgente } from './groq/agent.js'
-import { getLoja } from './database/supabase.js'
-app.post('/simulate', adminAuth, async (req, res) => {
-  const { phone, text, loja_id } = req.body
-  try {
-    const loja = await getLoja(loja_id) // ou buscar por id
-    if (!loja) return res.status(404).json({ error: 'Loja não encontrada' })
-    const { resposta } = await responderAgente({
-      loja, numeroCliente: phone,
-      mensagemAtual: text, tipoMensagem: 'texto'
-    })
-    res.json({ reply: resposta })
-  } catch(e) { res.status(500).json({ error: e.message }) }
-})</pre>
-
-            <hr class="divider">
-
-            <div style="font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--text-2)">2. Crie o arquivo <code>src/routes/conversas.js</code>:</div>
-            <pre>import { Router } from 'express'
-import { sb } from '../database/supabase.js'
-const router = Router()
-
-// Contatos únicos com última mensagem
-router.get('/:lojaId/contatos', async (req, res) => {
-  const { data } = await sb.from('conversas')
-    .select('numero_cliente, nome_cliente, content, created_at')
-    .eq('loja_id', req.params.lojaId)
-    .order('created_at', { ascending: false })
-  const map = new Map()
-  ;(data || []).forEach(r => {
-    if (!map.has(r.numero_cliente))
-      map.set(r.numero_cliente, { numero: r.numero_cliente,
-        nome: r.nome_cliente, ultima: r.content })
-  })
-  res.json(Array.from(map.values()))
-})
-
-// Histórico de um número
-router.get('/:lojaId/:numero', async (req, res) => {
-  const { data } = await sb.from('conversas')
-    .select('role, content, tipo, created_at')
-    .eq('loja_id', req.params.lojaId)
-    .eq('numero_cliente', req.params.numero)
-    .order('created_at', { ascending: true }).limit(80)
-  res.json(data || [])
-})
-
-// Limpar histórico
-router.delete('/:lojaId/:numero', async (req, res) => {
-  await sb.from('conversas').delete()
-    .eq('loja_id', req.params.lojaId)
-    .eq('numero_cliente', req.params.numero)
-  res.json({ ok: true })
-})
-
-export default router</pre>
-
-            <hr class="divider">
-
-            <div style="font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--text-2)">3. Sobre o site (consultar URL de produtos):</div>
-            <div style="font-size:13px;color:var(--text-2);line-height:1.8">
-              O agente <strong>não acessa seu site automaticamente</strong>, mas você pode criar uma rota de importação que faz isso. Ela pega o HTML do seu site, extrai os textos de produtos e usa o Groq para identificar nome/preço. 
-              Se quiser isso implementado, peça na próxima mensagem que eu crio o endpoint <code>/admin/importar-url</code> completo.
-            </div>
+        <!-- Desconectar -->
+        <div class="card">
+          <div class="ch"><div><div class="ct">Encerrar sessão atual</div><div class="cd">Use apenas se precisar trocar de número</div></div></div>
+          <div class="cb">
+            <div class="alert a-w"><span class="ai">⚠</span><span>Isso desconecta o WhatsApp atual e apaga a sessão salva. Você precisará conectar um número novamente.</span></div>
+            <button class="btn btn-d" onclick="doDisconnect()">Desconectar e limpar sessão</button>
           </div>
         </div>
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main-wrap -->
-</div><!-- /screen-app -->
+      <!-- CLIENTES -->
+      <div class="page" id="page-clientes">
+        <div class="seh"><div><div class="set">Gerenciar Clientes</div><div class="sed">Cada cliente = um número com agente próprio</div></div><button class="btn btn-p" onclick="openMo('ml')">＋ Novo cliente</button></div>
+        <div class="card" style="margin-bottom:20px"><div class="tw"><table><thead><tr><th>Nome</th><th>Número (wa_id)</th><th>Status</th><th>Ações</th></tr></thead><tbody id="ltb"><tr><td colspan="4" class="lr"><span class="spin"></span>Carregando...</td></tr></tbody></table></div></div>
+        <div class="card" style="border-color:var(--blue-200);background:var(--blue-50)"><div class="cb"><div style="font-size:14px;font-weight:700;color:var(--blue-700);margin-bottom:8px">Multi-cliente: como funciona</div><div style="font-size:13px;color:var(--blue-900);line-height:1.8">Cada cliente tem seu próprio <code>wa_id</code> e prompt personalizado. O agente identifica qual loja atender pelo número conectado. Após cadastrar um cliente aqui, vá em <strong>Conexão WhatsApp</strong> e vincule o número correspondente.</div></div></div>
+      </div>
 
-<!-- ══ MODAIS ════════════════════════════════════════════════ -->
-
-<!-- Modal: Produto -->
-<div class="modal-overlay" id="modal-produto">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Adicionar produto ao catálogo</div>
-      <button class="modal-close" onclick="closeModal('modal-produto')">×</button>
     </div>
-    <div class="modal-body">
-      <div class="field">
-        <label class="field-label">Nome do produto <span class="required">*</span></label>
-        <input type="text" class="input" id="p-nome" placeholder="Ex: Elfbar BC10000">
-      </div>
-      <div class="field">
-        <label class="field-label">Sabor / variação</label>
-        <input type="text" class="input" id="p-sabor" placeholder="Ex: Watermelon Ice, Mango Peach...">
-      </div>
+  </div>
+</div>
+
+<!-- MODAL PRODUTO -->
+<div class="mo" id="mp">
+  <div class="modal">
+    <div class="mh"><div class="mt">Adicionar produto</div><button class="mc" onclick="closeMo('mp')">×</button></div>
+    <div class="mb">
+      <div class="field"><label class="fll">Nome <span class="req">*</span></label><input type="text" class="input" id="pn" placeholder="Ex: Elfbar BC10000"></div>
+      <div class="field"><label class="fll">Sabor / variação</label><input type="text" class="input" id="psab" placeholder="Ex: Watermelon Ice"></div>
       <div class="form-row">
-        <div class="field">
-          <label class="field-label">Preço de venda (R$) <span class="required">*</span></label>
-          <input type="number" class="input" id="p-preco" placeholder="90.00" step="0.01" min="0">
-        </div>
-        <div class="field">
-          <label class="field-label">Estoque (unid.)</label>
-          <input type="number" class="input" id="p-qty" placeholder="10" min="0">
-        </div>
+        <div class="field"><label class="fll">Preço (R$) <span class="req">*</span></label><input type="number" class="input" id="ppr" placeholder="90.00" step="0.01" min="0"></div>
+        <div class="field"><label class="fll">Estoque</label><input type="number" class="input" id="pqt" placeholder="10" min="0"></div>
       </div>
-      <div class="field">
-        <label class="field-label">Descrição</label>
-        <textarea class="input" id="p-desc" rows="2" placeholder="Ex: 10.000 puffs, nicotina 50mg, edição especial"></textarea>
-      </div>
+      <div class="field"><label class="fll">Descrição</label><textarea class="input" id="pde" rows="2" placeholder="Ex: 10.000 puffs, nic 50mg"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-produto')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveProduto()">Adicionar produto</button>
-    </div>
+    <div class="mf"><button class="btn btn-o" onclick="closeMo('mp')">Cancelar</button><button class="btn btn-p" onclick="saveProd()">Adicionar</button></div>
   </div>
 </div>
 
-<!-- Modal: Loja -->
-<div class="modal-overlay" id="modal-loja">
+<!-- MODAL LOJA -->
+<div class="mo" id="ml">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-loja-title">Novo cliente</div>
-      <button class="modal-close" onclick="closeModal('modal-loja')">×</button>
+    <div class="mh"><div class="mt" id="mlt">Novo cliente</div><button class="mc" onclick="closeMo('ml')">×</button></div>
+    <div class="mb">
+      <div class="field"><label class="fll">Nome da empresa <span class="req">*</span></label><input type="text" class="input" id="lno" placeholder="Ex: WavePod Centro"></div>
+      <div class="field"><label class="fll">Número WhatsApp (wa_id) <span class="req">*</span></label><input type="text" class="input im" id="lwa" placeholder="5511958438636"><div class="fhi">Só números com DDI (55) + DDD + número.</div></div>
+      <div class="field"><label class="fll">Prompt inicial</label><textarea class="input" id="lpr" rows="3" placeholder="Você é um atendente simpático da [LOJA]..."></textarea><div class="fhi">Pode editar depois em Agente & Prompt.</div></div>
     </div>
-    <div class="modal-body">
-      <div class="field">
-        <label class="field-label">Nome da empresa / loja <span class="required">*</span></label>
-        <input type="text" class="input" id="l-nome" placeholder="Ex: WavePod Centro">
-      </div>
-      <div class="field">
-        <label class="field-label">Número do WhatsApp (wa_id) <span class="required">*</span></label>
-        <input type="text" class="input input-mono" id="l-waid" placeholder="5511958438636">
-        <div class="field-hint">Apenas números, com DDI (55) + DDD + número. Sem + nem espaços.</div>
-      </div>
-      <div class="field">
-        <label class="field-label">Prompt inicial</label>
-        <textarea class="input" id="l-prompt" rows="3" placeholder="Você é um atendente simpático da [LOJA]..."></textarea>
-        <div class="field-hint">Pode editar depois em Agente & Prompt com mais detalhes.</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-loja')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-save-loja" onclick="saveLoja()">Criar cliente</button>
-    </div>
+    <div class="mf"><button class="btn btn-o" onclick="closeMo('ml')">Cancelar</button><button class="btn btn-p" id="bsl" onclick="saveLoja()">Criar cliente</button></div>
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- ══ SCRIPT ════════════════════════════════════════════════ -->
 <script>
-/* ─── ESTADO ─────────────────────────────────────────────── */
-let API = '', SECRET = '', lojaAtiva = null, todasLojas = []
-let editingLojaId = null, contatoAtivo = null, currentPage = 'dashboard'
+let API='',SECRET='',lojaAtiva=null,todasLojas=[],editLojaId=null,contatoAtivo=null,pgAtual='dashboard'
 
-/* ─── CREDENCIAIS FIXAS ──────────────────────────────────────
-   Login do painel. Altere aqui se mudar usuário/senha.
-   ADMIN_SECRET deve ser IDÊNTICO ao valor de ADMIN_SECRET no .env
-─────────────────────────────────────────────────────────────── */
-const ADMIN_USER   = 'Admin'
-const ADMIN_PASS   = '181195Di@'
-const ADMIN_SECRET = 'wavepod_admin_2025'  // ← igual ao .env ADMIN_SECRET
-
-/* ─── LOGIN / LOGOUT ─────────────────────────────────────── */
-async function doLogin() {
-  const user = document.getElementById('i-user').value.trim()
-  const pass = document.getElementById('i-pass').value
-  const url  = document.getElementById('i-url').value.trim().replace(/\/$/, '')
-
-  // Valida credenciais localmente primeiro
-  if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
-    document.getElementById('login-error').style.display = 'block'
-    return
-  }
-
-  API    = url
-  SECRET = ADMIN_SECRET
-
-  // Verifica se a API está acessível
-  try {
-    const r = await fetch(`${API}/status`)
-    if (!r.ok) throw new Error('API retornou erro')
-    document.getElementById('login-error').style.display = 'none'
-    document.getElementById('screen-login').style.display = 'none'
-    document.getElementById('screen-app').style.display = 'block'
+async function doLogin(){
+  API=document.getElementById('i-url').value.trim().replace(/\/$/,'')
+  SECRET=document.getElementById('i-sec').value.trim()
+  try{
+    const r=await fetch(`${API}/status`)
+    if(!r.ok) throw new Error()
+    document.getElementById('sl').style.display='none'
+    document.getElementById('sa').style.display='block'
     await loadLojas()
     pollStatus()
-    setInterval(pollStatus, 12000)
+    setInterval(pollStatus,12000)
     loadDashboard()
-  } catch (e) {
-    document.getElementById('login-error').style.display = 'block'
-    document.getElementById('login-error').textContent = `Não foi possível conectar à API: ${url} — verifique se o servidor está rodando.`
-  }
+  }catch{document.getElementById('lerr').style.display='block'}
 }
+function doLogout(){API=SECRET='';lojaAtiva=null;document.getElementById('sa').style.display='none';document.getElementById('sl').style.display='flex'}
 
-function doLogout() {
-  API = SECRET = ''
-  lojaAtiva = null
-  document.getElementById('screen-app').style.display = 'none'
-  document.getElementById('screen-login').style.display = 'flex'
-}
-
-/* ─── HTTP HELPER ─────────────────────────────────────────── */
-async function req(path, method = 'GET', body = null) {
-  const opts = { method, headers: { 'Content-Type': 'application/json', 'x-admin-secret': SECRET } }
-  if (body) opts.body = JSON.stringify(body)
-  const r = await fetch(API + path, opts)
-  if (!r.ok) throw new Error(await r.text())
+async function rq(path,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json','x-admin-secret':SECRET}}
+  if(body) opts.body=JSON.stringify(body)
+  const r=await fetch(API+path,opts)
+  if(!r.ok) throw new Error(await r.text())
   return r.json()
 }
 
-/* ─── NAVEGAÇÃO ──────────────────────────────────────────── */
-function goPage(name, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
+async function pollStatus(){
+  try{
+    const s=await fetch(`${API}/status`).then(r=>r.json())
+    const ok=s.whatsapp==='conectado'
+    const dot=document.getElementById('sdot')
+    if(ok){dot.classList.add('online');document.getElementById('slbl').textContent='WhatsApp online';document.getElementById('snum').textContent=s.numero||''}
+    else{dot.classList.remove('online');document.getElementById('slbl').textContent='Aguardando QR';document.getElementById('snum').textContent=''}
+    const sw=document.getElementById('s-wa')
+    if(sw){sw.textContent=ok?'Online':'Offline';sw.style.color=ok?'var(--green-600)':'var(--amber-600)'}
+    if(document.getElementById('s-wa-n')) document.getElementById('s-wa-n').textContent=ok?s.numero||'':'—'
+  }catch{document.getElementById('sdot').classList.remove('online');document.getElementById('slbl').textContent='API inacessível'}
+}
+
+function gp(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'))
   document.getElementById(`page-${name}`).classList.add('active')
-  if (el) el.classList.add('active')
-  currentPage = name
-  document.getElementById('topbar-page').textContent = el ? el.textContent.trim() : name
-  if (name === 'dashboard')   loadDashboard()
-  if (name === 'agente')      loadAgenteForm()
-  if (name === 'produtos')    loadProdutos()
-  if (name === 'pedidos')     loadPedidos()
-  if (name === 'conversas')   loadContatos()
-  if (name === 'clientes')    loadLojasTabela()
+  if(el) el.classList.add('active')
+  pgAtual=name
+  document.getElementById('tp-page').textContent=el?el.textContent.trim():name
+  if(name==='dashboard') loadDashboard()
+  if(name==='agente') loadAgenteForm()
+  if(name==='produtos') loadProdutos()
+  if(name==='pedidos') loadPedidos()
+  if(name==='conversas') loadContatos()
+  if(name==='clientes') loadLojasTab()
+  if(name==='conexao') checkConnStatus()
+}
+function refreshPage(){
+  if(pgAtual==='dashboard') loadDashboard()
+  if(pgAtual==='agente') loadAgenteForm()
+  if(pgAtual==='produtos') loadProdutos()
+  if(pgAtual==='pedidos') loadPedidos()
+  if(pgAtual==='conversas') loadContatos()
+  if(pgAtual==='clientes') loadLojasTab()
+  if(pgAtual==='conexao') checkConnStatus()
 }
 
-function refreshPage() {
-  if (currentPage === 'dashboard')  loadDashboard()
-  if (currentPage === 'agente')     loadAgenteForm()
-  if (currentPage === 'produtos')   loadProdutos()
-  if (currentPage === 'pedidos')    loadPedidos()
-  if (currentPage === 'conversas')  loadContatos()
-  if (currentPage === 'clientes')   loadLojasTabela()
+async function loadLojas(){
+  todasLojas=await rq('/admin/lojas')
+  const sel=document.getElementById('sel-loja')
+  sel.innerHTML=todasLojas.length?todasLojas.map(l=>`<option value="${l.id}">${e(l.nome)}</option>`).join(''):'<option>Nenhum cliente</option>'
+  if(todasLojas.length){lojaAtiva=todasLojas[0];document.getElementById('tp-loja').textContent=lojaAtiva.nome}
 }
-
-/* ─── STATUS WHATSAPP ─────────────────────────────────────── */
-async function pollStatus() {
-  try {
-    const s = await fetch(`${API}/status`).then(r => r.json())
-    const dot = document.getElementById('status-dot')
-    const lbl = document.getElementById('status-label')
-    const num = document.getElementById('status-num')
-    const sw  = document.getElementById('s-wa')
-    if (s.status === 'conectado' || s.numero) {
-      dot.classList.add('online')
-      lbl.textContent = 'WhatsApp online'
-      num.textContent = s.numero || ''
-      if (sw) { sw.textContent = 'Online'; sw.style.color = 'var(--green-600)' }
-      if (document.getElementById('s-wa-num')) document.getElementById('s-wa-num').textContent = s.numero || ''
-    } else {
-      dot.classList.remove('online')
-      lbl.textContent = 'Aguardando QR Code'
-      num.textContent = 'Escaneie no terminal'
-      if (sw) { sw.textContent = 'Offline'; sw.style.color = 'var(--amber-600)' }
-    }
-  } catch {
-    document.getElementById('status-dot').classList.remove('online')
-    document.getElementById('status-label').textContent = 'API inacessível'
-    document.getElementById('status-num').textContent = ''
-  }
-}
-
-/* ─── LOJAS / CLIENTES ───────────────────────────────────── */
-async function loadLojas() {
-  const sel = document.getElementById('sel-loja')
-  try {
-    todasLojas = await req('/admin/lojas')
-    sel.innerHTML = todasLojas.length
-      ? todasLojas.map(l => `<option value="${l.id}">${l.nome}</option>`).join('')
-      : '<option value="">Nenhum cliente cadastrado</option>'
-    if (todasLojas.length) {
-      lojaAtiva = todasLojas[0]
-      document.getElementById('topbar-loja').textContent = lojaAtiva.nome
-    }
-  } catch(e) {
-    console.error('[loadLojas] Erro:', e.message)
-    sel.innerHTML = '<option value="">Erro ao carregar — verifique o ADMIN_SECRET</option>'
-    toast('Erro ao carregar lojas: ' + e.message, 'error')
-  }
-}
-
-function onTrocarLoja() {
-  const id = document.getElementById('sel-loja').value
-  lojaAtiva = todasLojas.find(l => l.id === id) || null
-  document.getElementById('topbar-loja').textContent = lojaAtiva?.nome || ''
+function onTrocar(){
+  const id=document.getElementById('sel-loja').value
+  lojaAtiva=todasLojas.find(l=>l.id===id)||null
+  document.getElementById('tp-loja').textContent=lojaAtiva?.nome||''
   refreshPage()
 }
-
-async function loadLojasTabela() {
-  if (!todasLojas.length) todasLojas = await req('/admin/lojas')
-  const tbody = document.getElementById('lojas-tbody')
-  if (!todasLojas.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">⊞</div><div class="empty-title">Nenhum cliente cadastrado</div></div></td></tr>`
-    return
-  }
-  tbody.innerHTML = todasLojas.map(l => `
-    <tr>
-      <td><strong>${esc(l.nome)}</strong></td>
-      <td class="td-mono">${esc(l.wa_id)}</td>
-      <td>${l.ativa ? '<span class="badge badge-green"><span class="badge-dot"></span>Ativo</span>' : '<span class="badge badge-slate">Inativo</span>'}</td>
-      <td>
-        <div class="flex gap-8">
-          <button class="btn btn-outline btn-xs" onclick="editLoja('${l.id}')">Editar</button>
-          <button class="btn btn-ghost btn-xs" onclick="toggleLoja('${l.id}', ${!l.ativa})">${l.ativa ? 'Desativar' : 'Ativar'}</button>
-        </div>
-      </td>
-    </tr>`).join('')
+async function loadLojasTab(){
+  if(!todasLojas.length) todasLojas=await rq('/admin/lojas')
+  const tbody=document.getElementById('ltb')
+  if(!todasLojas.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty"><div class="ei">⊞</div><div class="etit">Nenhum cliente</div></div></td></tr>`;return}
+  tbody.innerHTML=todasLojas.map(l=>`<tr><td><strong>${e(l.nome)}</strong></td><td class="tm">${e(l.wa_id)}</td><td>${l.ativa?'<span class="badge b-gn"><span class="bdot"></span>Ativo</span>':'<span class="badge b-sl">Inativo</span>'}</td><td><div class="btn-grp"><button class="btn btn-o btn-xs" onclick="editLoja('${l.id}')">Editar</button><button class="btn btn-g btn-xs" onclick="togLoja('${l.id}',${!l.ativa})">${l.ativa?'Desativar':'Ativar'}</button></div></td></tr>`).join('')
 }
-
-function openModal(id) { document.getElementById(id).classList.add('open') }
-function closeModal(id) {
+function openMo(id){document.getElementById(id).classList.add('open')}
+function closeMo(id){
   document.getElementById(id).classList.remove('open')
-  editingLojaId = null
-  document.getElementById('modal-loja-title').textContent = 'Novo cliente'
-  document.getElementById('btn-save-loja').textContent = 'Criar cliente'
+  editLojaId=null
+  document.getElementById('mlt').textContent='Novo cliente'
+  document.getElementById('bsl').textContent='Criar cliente'
+  document.getElementById('bsl').onclick=saveLoja
+}
+async function saveLoja(){
+  const nome=document.getElementById('lno').value.trim()
+  const wa_id=document.getElementById('lwa').value.replace(/\D/g,'')
+  const prompt_base=document.getElementById('lpr').value.trim()
+  if(!nome||!wa_id){toast('Nome e número obrigatórios','error');return}
+  try{
+    if(editLojaId) await rq(`/admin/lojas/${editLojaId}`,'PATCH',{nome,prompt_base})
+    else await rq('/admin/lojas','POST',{nome,wa_id,prompt_base,ativa:true})
+    closeMo('ml');await loadLojas();loadLojasTab()
+    toast(editLojaId?'Cliente atualizado':'Cliente criado','success')
+  }catch(err){toast('Erro: '+err.message,'error')}
+}
+async function editLoja(id){
+  const l=todasLojas.find(x=>x.id===id);if(!l) return
+  editLojaId=id
+  document.getElementById('lno').value=l.nome
+  document.getElementById('lwa').value=l.wa_id
+  document.getElementById('lpr').value=l.prompt_base||''
+  document.getElementById('mlt').textContent='Editar cliente'
+  document.getElementById('bsl').textContent='Salvar'
+  openMo('ml')
+}
+async function togLoja(id,ativa){
+  await rq(`/admin/lojas/${id}`,'PATCH',{ativa})
+  await loadLojas();loadLojasTab()
+  toast(ativa?'Cliente ativado':'Cliente desativado','success')
 }
 
-async function saveLoja() {
-  const nome     = document.getElementById('l-nome').value.trim()
-  const wa_id    = document.getElementById('l-waid').value.replace(/\D/g, '')
-  const prompt_base = document.getElementById('l-prompt').value.trim()
-  if (!nome || !wa_id) { toast('Nome e número são obrigatórios', 'error'); return }
-  try {
-    if (editingLojaId) {
-      await req(`/admin/lojas/${editingLojaId}`, 'PATCH', { nome, prompt_base })
-      toast('Cliente atualizado com sucesso', 'success')
-    } else {
-      await req('/admin/lojas', 'POST', { nome, wa_id, prompt_base, ativa: true })
-      toast('Cliente criado com sucesso', 'success')
-    }
-    closeModal('modal-loja')
-    await loadLojas()
-    loadLojasTabela()
-  } catch(e) { toast('Erro: ' + e.message, 'error') }
-}
-
-async function editLoja(id) {
-  const l = todasLojas.find(x => x.id === id)
-  if (!l) return
-  editingLojaId = id
-  document.getElementById('l-nome').value   = l.nome
-  document.getElementById('l-waid').value   = l.wa_id
-  document.getElementById('l-prompt').value = l.prompt_base || ''
-  document.getElementById('modal-loja-title').textContent = 'Editar cliente'
-  document.getElementById('btn-save-loja').textContent    = 'Salvar alterações'
-  openModal('modal-loja')
-}
-
-async function toggleLoja(id, ativa) {
-  await req(`/admin/lojas/${id}`, 'PATCH', { ativa })
-  await loadLojas()
-  loadLojasTabela()
-  toast(ativa ? 'Cliente ativado' : 'Cliente desativado', 'success')
-}
-
-/* ─── DASHBOARD ──────────────────────────────────────────── */
-async function loadDashboard() {
-  if (!lojaAtiva) return
-  document.getElementById('dash-title').textContent = `Dashboard — ${lojaAtiva.nome}`
-
-  // Stats básicos via pedidos e produtos
-  try {
-    const [produtos, pedidos] = await Promise.all([
-      req(`/admin/produtos?loja_id=${lojaAtiva.id}`),
-      req(`/admin/pedidos?loja_id=${lojaAtiva.id}`),
-    ])
-    document.getElementById('s-prod').textContent = produtos.filter(p => p.ativo !== false).length
-    const pend = pedidos.filter(p => p.status === 'Pendente').length
-    document.getElementById('s-ped').textContent  = pend
-
-    // Conversas nas últimas 24h
-    try {
-      const stats = await req(`/admin/conversas/${lojaAtiva.id}/stats/hoje`)
-      document.getElementById('s-conv').textContent = stats.total ?? '—'
-    } catch { document.getElementById('s-conv').textContent = '—' }
-
-    const tbody = document.getElementById('dash-pedidos-tbody')
-    const latest = pedidos.slice(0, 5)
-    if (!latest.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">◎</div><div class="empty-title">Nenhum pedido ainda</div></div></td></tr>`
-    } else {
-      tbody.innerHTML = latest.map(p => {
-        const itens = parseItens(p.itens)
-        const itensStr = itens.map(i => `${i.qty||1}× ${i.nome}`).join(', ')
-        const cls = { Pendente:'amber', Confirmado:'green', Entregue:'blue', Cancelado:'red' }[p.status] || 'slate'
-        return `<tr>
-          <td><strong>${esc(p.nome_cliente||'—')}</strong><br><span class="td-muted">${esc(p.numero_cliente)}</span></td>
-          <td class="text-sm">${esc(itensStr)}</td>
-          <td><strong style="color:var(--blue-600)">R$ ${fmtR(p.total)}</strong></td>
-          <td><span class="badge badge-${cls}">${p.status}</span></td>
-          <td class="td-muted">${fmtDate(p.created_at)}</td>
-        </tr>`
-      }).join('')
-    }
-  } catch(e) { console.error('Dashboard error:', e) }
-}
-
-/* ─── AGENTE ─────────────────────────────────────────────── */
-function loadAgenteForm() {
-  if (!lojaAtiva) return
-  document.getElementById('a-prompt').value = lojaAtiva.prompt_base || ''
-  document.getElementById('a-inst').value   = lojaAtiva.instrucoes_extras || ''
-  cc('a-prompt', 'cc-prompt')
-  cc('a-inst', 'cc-inst')
-}
-
-async function salvarAgente() {
-  if (!lojaAtiva) { toast('Selecione um cliente', 'error'); return }
-  const prompt_base      = document.getElementById('a-prompt').value
-  const instrucoes_extras = document.getElementById('a-inst').value
-  try {
-    await req(`/admin/lojas/${lojaAtiva.id}`, 'PATCH', { prompt_base, instrucoes_extras })
-    lojaAtiva.prompt_base       = prompt_base
-    lojaAtiva.instrucoes_extras = instrucoes_extras
-    toast('Configuração salva — o agente já usa o novo prompt', 'success')
-  } catch(e) { toast('Erro ao salvar: ' + e.message, 'error') }
-}
-
-function addChip(fieldId, text) {
-  const el  = document.getElementById(fieldId)
-  const sep = el.value && !el.value.endsWith('\n') ? '\n' : ''
-  el.value += sep + text + '\n'
-  cc(fieldId, fieldId === 'a-prompt' ? 'cc-prompt' : 'cc-inst')
-  el.focus()
-}
-
-function cc(fid, cid) {
-  const l = document.getElementById(fid).value.length
-  document.getElementById(cid).textContent = `${l} caractere${l!==1?'s':''}`
-}
-
-async function doTest() {
-  if (!lojaAtiva) { toast('Selecione um cliente', 'error'); return }
-  const msg = document.getElementById('i-test').value.trim()
-  if (!msg) return
-  document.getElementById('i-test').value = ''
-
-  const box = document.getElementById('chat-test')
-  if (box.querySelector('.empty')) box.innerHTML = ''
-  box.innerHTML += `<div class="bubble user"><div class="bubble-who">👤 Cliente simulado</div>${esc(msg)}</div>`
-  box.innerHTML += `<div class="bubble assistant" id="bubble-typing"><div class="bubble-who">🤖 Agente</div><span style="opacity:.5">digitando...</span></div>`
-  box.scrollTop = box.scrollHeight
-
-  try {
-    const r = await fetch(`${API}/simulate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-secret': SECRET },
-      body: JSON.stringify({ phone: '99900000001', text: msg, loja_id: lojaAtiva.id })
-    })
-    const data = await r.json()
-    const b = document.getElementById('bubble-typing')
-    const reply = data.reply || data.resposta || data.erro || data.error || 'Sem resposta'
-    if (b) b.innerHTML = `<div class="bubble-who">🤖 Agente</div>${esc(reply)}`
-    box.scrollTop = box.scrollHeight
-  } catch(e) {
-    const b = document.getElementById('bubble-typing')
-    if (b) b.innerHTML = `<div class="bubble-who">🤖 Agente</div><span style="color:var(--red-600)">Erro: ${e.message}</span>`
-  }
-}
-
-/* ─── PRODUTOS ───────────────────────────────────────────── */
-async function loadProdutos() {
-  if (!lojaAtiva) return
-  const grid = document.getElementById('produto-grid')
-  grid.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando produtos...</div>'
-  try {
-    const prods = await req(`/admin/produtos?loja_id=${lojaAtiva.id}`)
-    if (!prods.length) {
-      grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">▣</div><div class="empty-title">Nenhum produto cadastrado</div><div class="empty-desc">Adicione os produtos que o agente vai oferecer</div></div>`
-      return
-    }
-    grid.innerHTML = prods.map(p => `
-      <div class="produto-card">
-        <button class="produto-del" onclick="deleteProduto('${p.id}')" title="Remover">×</button>
-        <div class="produto-card-name">${esc(p.nome)}</div>
-        <div class="produto-card-sabor">${p.sabor ? esc(p.sabor) : '<span style="opacity:.4">sem variação</span>'}</div>
-        <div class="produto-card-footer">
-          <div>
-            <div class="produto-card-preco">R$ ${fmtR(p.preco_venda)}</div>
-            <div class="produto-card-qty">${p.quantidade != null ? p.quantidade + ' un. estoque' : 'estoque não informado'}</div>
-          </div>
-          <span class="badge badge-green">ativo</span>
-        </div>
-        ${p.descricao ? `<div class="produto-card-desc">${esc(p.descricao)}</div>` : ''}
-      </div>`).join('')
-  } catch(e) {
-    grid.innerHTML = `<div class="loading-row" style="color:var(--red-600)">Erro: ${e.message}</div>`
-  }
-}
-
-async function saveProduto() {
-  if (!lojaAtiva) { toast('Selecione um cliente', 'error'); return }
-  const nome = document.getElementById('p-nome').value.trim()
-  if (!nome) { toast('Nome é obrigatório', 'error'); return }
-  const payload = {
-    loja_id: lojaAtiva.id,
-    nome,
-    sabor:       document.getElementById('p-sabor').value.trim() || null,
-    preco_venda: parseFloat(document.getElementById('p-preco').value) || null,
-    quantidade:  parseInt(document.getElementById('p-qty').value) || null,
-    descricao:   document.getElementById('p-desc').value.trim() || null,
-    ativo: true,
-  }
-  try {
-    await req('/admin/produtos', 'POST', payload)
-    closeModal('modal-produto')
-    await loadProdutos()
-    toast('Produto adicionado — o agente já o inclui nas respostas', 'success')
-  } catch(e) { toast('Erro: ' + e.message, 'error') }
-}
-
-async function deleteProduto(id) {
-  if (!confirm('Remover este produto do catálogo?')) return
-  try {
-    await req(`/admin/produtos/${id}`, 'PATCH', { ativo: false })
-    await loadProdutos()
-    toast('Produto removido do catálogo', 'success')
-  } catch(e) { toast('Erro: ' + e.message, 'error') }
-}
-
-/* ─── PEDIDOS ────────────────────────────────────────────── */
-async function loadPedidos() {
-  if (!lojaAtiva) return
-  const filter = document.getElementById('filter-pedido').value
-  const tbody  = document.getElementById('pedidos-tbody')
-  tbody.innerHTML = `<tr><td colspan="7" class="loading-row"><span class="spinner"></span>Carregando...</td></tr>`
-  try {
-    const pedidos = await req(`/admin/pedidos?loja_id=${lojaAtiva.id}`)
-    const filtered = filter ? pedidos.filter(p => p.status === filter) : pedidos
-    if (!filtered.length) {
-      tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">◎</div><div class="empty-title">Nenhum pedido encontrado</div></div></td></tr>`
-      return
-    }
-    const clsMap = { Pendente:'amber', Confirmado:'green', Entregue:'blue', Cancelado:'red' }
-    tbody.innerHTML = filtered.map(p => {
-      const itens = parseItens(p.itens)
-      const itensStr = itens.map(i => `${i.qty||1}× ${i.nome||'?'}`).join(', ') || '—'
-      const cls = clsMap[p.status] || 'slate'
-      return `<tr>
-        <td>
-          <strong>${esc(p.nome_cliente||'—')}</strong>
-          <div class="td-mono" style="font-size:11px;margin-top:2px">${esc(p.numero_cliente)}</div>
-        </td>
-        <td style="max-width:200px;font-size:12px">${esc(itensStr)}</td>
-        <td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ${fmtR(p.total)}</strong></td>
-        <td class="text-sm">${esc(p.pagamento||'—')}</td>
-        <td><span class="badge badge-${cls}">${p.status}</span></td>
-        <td class="td-muted">${fmtDate(p.created_at)}</td>
-        <td>
-          <select onchange="updatePedido('${p.id}',this.value)" style="font-size:12px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--font)">
-            <option value="" disabled selected>Atualizar...</option>
-            <option value="Confirmado">✅ Confirmar</option>
-            <option value="Entregue">📦 Entregue</option>
-            <option value="Cancelado">❌ Cancelar</option>
-          </select>
-        </td>
-      </tr>`
+async function loadDashboard(){
+  if(!lojaAtiva) return
+  document.getElementById('dash-title').textContent=`Dashboard — ${lojaAtiva.nome}`
+  try{
+    const ch=await rq(`/admin/conversas/${lojaAtiva.id}/stats/hoje`).catch(()=>({total:'?'}))
+    document.getElementById('s-conv').textContent=ch.total??'—'
+    const[prods,peds]=await Promise.all([rq(`/admin/produtos?loja_id=${lojaAtiva.id}`),rq(`/admin/pedidos?loja_id=${lojaAtiva.id}`)])
+    document.getElementById('s-prod').textContent=prods.filter(p=>p.ativo!==false).length
+    document.getElementById('s-ped').textContent=peds.filter(p=>p.status==='Pendente').length
+    const tbody=document.getElementById('dp-tbody')
+    const lt=peds.slice(0,5)
+    if(!lt.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="ei">◎</div><div class="etit">Nenhum pedido</div></div></td></tr>`;return}
+    const cls={Pendente:'am',Confirmado:'gn',Entregue:'bl',Cancelado:'rd'}
+    tbody.innerHTML=lt.map(p=>{
+      const its=piItens(p.itens).map(i=>`${i.qty||1}× ${i.nome||'?'}`).join(', ')||'—'
+      const c=cls[p.status]||'sl'
+      return`<tr><td><strong>${e(p.nome_cliente||'—')}</strong><br><span class="tmu">${e(p.numero_cliente)}</span></td><td style="font-size:12px;max-width:180px">${e(its)}</td><td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ${fR(p.total)}</strong></td><td><span class="badge b-${c}">${p.status}</span></td><td class="tmu">${fD(p.created_at)}</td></tr>`
     }).join('')
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="7" class="loading-row" style="color:var(--red-600)">Erro: ${e.message}</td></tr>`
-  }
+  }catch(err){console.error('Dashboard:',err)}
 }
 
-async function updatePedido(id, status) {
-  try {
-    await req(`/admin/pedidos/${id}`, 'PATCH', { status })
-    await loadPedidos()
-    toast(`Pedido marcado como "${status}"`, 'success')
-  } catch(e) { toast('Erro: ' + e.message, 'error') }
+function loadAgenteForm(){
+  if(!lojaAtiva) return
+  document.getElementById('a-p').value=lojaAtiva.prompt_base||''
+  document.getElementById('a-i').value=lojaAtiva.instrucoes_extras||''
+  cc('a-p','cc-p');cc('a-i','cc-i')
+}
+async function salvarAgente(){
+  if(!lojaAtiva){toast('Selecione um cliente','error');return}
+  const pb=document.getElementById('a-p').value,ie=document.getElementById('a-i').value
+  try{
+    await rq(`/admin/lojas/${lojaAtiva.id}`,'PATCH',{prompt_base:pb,instrucoes_extras:ie})
+    lojaAtiva.prompt_base=pb;lojaAtiva.instrucoes_extras=ie
+    toast('Salvo — efeito na próxima mensagem','success')
+  }catch(err){toast('Erro: '+err.message,'error')}
+}
+function addChip(fid,t){
+  const el=document.getElementById(fid);const s=el.value&&!el.value.endsWith('\n')?'\n':''
+  el.value+=s+t+'\n';cc(fid,fid==='a-p'?'cc-p':'cc-i');el.focus()
+}
+function cc(fid,cid){const l=document.getElementById(fid).value.length;document.getElementById(cid).textContent=`${l} caractere${l!==1?'s':''}`}
+function limT(){document.getElementById('ct').innerHTML='<div class="empty"><div class="ei">💬</div><div class="etit">Pronto para testar</div></div>'}
+async function doTest(){
+  if(!lojaAtiva){toast('Selecione um cliente','error');return}
+  const msg=document.getElementById('i-t').value.trim();if(!msg) return
+  document.getElementById('i-t').value=''
+  const box=document.getElementById('ct')
+  if(box.querySelector('.empty')) box.innerHTML=''
+  box.innerHTML+=`<div class="bub user"><div class="bw">👤 Cliente simulado</div>${e(msg)}</div>`
+  box.innerHTML+=`<div class="bub assistant" id="bt"><div class="bw">🤖 Agente</div><span style="opacity:.5">digitando...</span></div>`
+  box.scrollTop=box.scrollHeight
+  try{
+    const r=await fetch(`${API}/simulate`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-secret':SECRET},body:JSON.stringify({phone:'99900000001',text:msg,loja_id:lojaAtiva.id})})
+    const d=await r.json()
+    const b=document.getElementById('bt')
+    if(b) b.innerHTML=`<div class="bw">🤖 Agente</div>${e(d.reply||d.resposta||d.erro||'Sem resposta')}`
+    box.scrollTop=box.scrollHeight
+  }catch(err){const b=document.getElementById('bt');if(b) b.innerHTML=`<div class="bw">🤖 Agente</div><span style="color:var(--red-600)">Erro: ${err.message}</span>`}
 }
 
-/* ─── CONVERSAS ──────────────────────────────────────────── */
-async function loadContatos() {
-  if (!lojaAtiva) return
-  const list = document.getElementById('contatos-list')
-  list.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando...</div>'
-  try {
-    const contatos = await req(`/admin/conversas/${lojaAtiva.id}/contatos`)
-    if (!contatos.length) {
-      list.innerHTML = '<div class="loading-row" style="color:var(--text-3)">Nenhuma conversa ainda</div>'
-      return
+async function loadProdutos(){
+  if(!lojaAtiva) return
+  const grid=document.getElementById('pgrid')
+  grid.innerHTML='<div class="lr"><span class="spin"></span>Carregando...</div>'
+  try{
+    const prods=await rq(`/admin/produtos?loja_id=${lojaAtiva.id}`)
+    if(!prods.length){grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="ei">▣</div><div class="etit">Nenhum produto</div></div>`;return}
+    grid.innerHTML=prods.map(p=>`<div class="pc"><button class="pd" onclick="delProd('${p.id}')">×</button><div class="pn">${e(p.nome)}</div><div class="ps">${p.sabor?e(p.sabor):'<span style="opacity:.4">—</span>'}</div><div class="pf"><div><div class="pp">R$ ${fR(p.preco_venda)}</div><div class="pq">${p.quantidade!=null?p.quantidade+' un.':'—'}</div></div><span class="badge b-gn">ativo</span></div>${p.descricao?`<div class="pde">${e(p.descricao)}</div>`:''}</div>`).join('')
+  }catch(err){grid.innerHTML=`<div class="lr" style="color:var(--red-600)">Erro: ${err.message}</div>`}
+}
+async function saveProd(){
+  if(!lojaAtiva){toast('Selecione um cliente','error');return}
+  const nome=document.getElementById('pn').value.trim();if(!nome){toast('Nome obrigatório','error');return}
+  const pl={loja_id:lojaAtiva.id,nome,sabor:document.getElementById('psab').value.trim()||null,preco_venda:parseFloat(document.getElementById('ppr').value)||null,quantidade:parseInt(document.getElementById('pqt').value)||null,descricao:document.getElementById('pde').value.trim()||null,ativo:true}
+  try{await rq('/admin/produtos','POST',pl);closeMo('mp');await loadProdutos();toast('Produto adicionado','success')}catch(err){toast('Erro: '+err.message,'error')}
+}
+async function delProd(id){
+  if(!confirm('Remover este produto?')) return
+  try{await rq(`/admin/produtos/${id}`,'PATCH',{ativo:false});await loadProdutos();toast('Removido','success')}catch(err){toast('Erro: '+err.message,'error')}
+}
+
+async function loadPedidos(){
+  if(!lojaAtiva) return
+  const f=document.getElementById('fp').value,tbody=document.getElementById('ptb')
+  tbody.innerHTML=`<tr><td colspan="7" class="lr"><span class="spin"></span>Carregando...</td></tr>`
+  try{
+    const peds=await rq(`/admin/pedidos?loja_id=${lojaAtiva.id}`)
+    const filt=f?peds.filter(p=>p.status===f):peds
+    if(!filt.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">◎</div><div class="etit">Nenhum pedido</div></div></td></tr>`;return}
+    const cls={Pendente:'am',Confirmado:'gn',Entregue:'bl',Cancelado:'rd'}
+    tbody.innerHTML=filt.map(p=>{
+      const its=piItens(p.itens).map(i=>`${i.qty||1}× ${i.nome||'?'}`).join(', ')||'—'
+      const c=cls[p.status]||'sl'
+      return`<tr><td><strong>${e(p.nome_cliente||'—')}</strong><div class="tm" style="font-size:11px;margin-top:2px">${e(p.numero_cliente)}</div></td><td style="font-size:12px;max-width:200px">${e(its)}</td><td><strong style="color:var(--blue-600);font-family:var(--mono)">R$ ${fR(p.total)}</strong></td><td class="tmu">${e(p.pagamento||'—')}</td><td><span class="badge b-${c}">${p.status}</span></td><td class="tmu">${fD(p.created_at)}</td><td><select onchange="updPed('${p.id}',this.value)" style="font-size:12px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--font)"><option value="" disabled selected>Atualizar...</option><option value="Confirmado">✅ Confirmar</option><option value="Entregue">📦 Entregue</option><option value="Cancelado">❌ Cancelar</option></select></td></tr>`
+    }).join('')
+  }catch(err){tbody.innerHTML=`<tr><td colspan="7" class="lr" style="color:var(--red-600)">Erro: ${err.message}</td></tr>`}
+}
+async function updPed(id,status){try{await rq(`/admin/pedidos/${id}`,'PATCH',{status});await loadPedidos();toast(`Pedido: ${status}`,'success')}catch(err){toast('Erro: '+err.message,'error')}}
+
+async function loadContatos(){
+  if(!lojaAtiva) return
+  const list=document.getElementById('clist')
+  list.innerHTML='<div class="lr"><span class="spin"></span>Carregando...</div>'
+  try{
+    const cs=await rq(`/admin/conversas/${lojaAtiva.id}/contatos`)
+    if(!cs.length){list.innerHTML='<div class="lr" style="color:var(--text-3)">Nenhuma conversa ainda</div>';return}
+    list.innerHTML=cs.map(c=>`<div onclick="openConv('${e(c.numero)}')" style="padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background='var(--blue-50)'" onmouseout="this.style.background=''"><div style="font-size:13px;font-weight:600;color:var(--text)">${e(c.nome||c.numero)}</div><div style="font-size:11.5px;color:var(--text-3);font-family:var(--mono)">${e(c.numero)}</div>${c.ultima?`<div style="font-size:11.5px;color:var(--text-3);margin-top:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:200px">${e(c.ultima.substring(0,50))}</div>`:''}</div>`).join('')
+  }catch(err){list.innerHTML=`<div class="lr" style="color:var(--red-600)">Erro: ${err.message}</div>`}
+}
+async function openConv(num){
+  contatoAtivo=num
+  document.getElementById('ctit').textContent=`Conversa — ${num}`
+  document.getElementById('bcc').style.display='inline-flex'
+  const box=document.getElementById('cconv')
+  box.innerHTML='<div class="lr"><span class="spin"></span>Carregando...</div>'
+  try{
+    const msgs=await rq(`/admin/conversas/${lojaAtiva.id}/${num}`)
+    if(!msgs.length){box.innerHTML='<div class="empty"><div class="etit">Sem mensagens</div></div>';return}
+    box.innerHTML=msgs.map(m=>`<div class="bub ${m.role}"><div class="bw">${m.role==='user'?'👤 Cliente':'🤖 Agente'}</div>${e(m.content)}</div>`).join('')
+    box.scrollTop=box.scrollHeight
+  }catch(err){box.innerHTML=`<div class="lr" style="color:var(--red-600)">Erro: ${err.message}</div>`}
+}
+async function clrConv(){
+  if(!confirm(`Limpar histórico de ${contatoAtivo}?`)) return
+  try{await rq(`/admin/conversas/${lojaAtiva.id}/${contatoAtivo}`,'DELETE');document.getElementById('cconv').innerHTML='<div class="empty"><div class="etit">Histórico apagado</div></div>';await loadContatos();toast('Histórico apagado','success')}catch(err){toast('Erro: '+err.message,'error')}
+}
+
+// ── CONEXÃO WHATSAPP ─────────────────────────────────────────────────────────
+async function checkConnStatus(){
+  const box=document.getElementById('conn-status-box')
+  const pairDiv=document.getElementById('pairing-display')
+  box.className='conn-status waiting'
+  box.innerHTML='<span class="spin"></span>Verificando...'
+  pairDiv.style.display='none'
+  try{
+    const s=await rq('/connect-status')
+    if(s.status==='conectado'){
+      box.className='conn-status connected'
+      box.innerHTML=`✅ WhatsApp conectado — número: <strong>${s.numero||'—'}</strong>`
+    }else if(s.status==='pairing_code'&&s.pairingCode){
+      box.className='conn-status waiting'
+      box.innerHTML='⏳ Aguardando vinculação — digite o código abaixo no WhatsApp'
+      document.getElementById('pair-code-val').textContent=s.pairingCode
+      pairDiv.style.display='block'
+    }else if(s.status==='erro'){
+      box.className='conn-status error'
+      box.innerHTML=`❌ Erro: ${s.erro||'desconhecido'}`
+    }else{
+      box.className='conn-status waiting'
+      box.innerHTML='⏳ '+({aguardando:'Aguardando conexão',qr:'QR gerado no terminal',desconectado:'Desconectado'}[s.status]||s.status)
     }
-    list.innerHTML = contatos.map(c => `
-      <div onclick="openConv('${esc(c.numero)}')"
-        style="padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s"
-        onmouseover="this.style.background='var(--blue-50)'" onmouseout="this.style.background=''">
-        <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(c.nome || c.numero)}</div>
-        <div style="font-size:11.5px;color:var(--text-3);font-family:var(--mono)">${esc(c.numero)}</div>
-        ${c.ultima ? `<div style="font-size:11.5px;color:var(--text-3);margin-top:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:200px">${esc(c.ultima.substring(0,50))}</div>` : ''}
-      </div>`).join('')
-  } catch {
-    list.innerHTML = '<div class="loading-row" style="color:var(--amber-600)">Rota /admin/conversas não encontrada.<br>Veja "Arquivos extras" no guia de hospedagem.</div>'
+  }catch(err){
+    box.className='conn-status error'
+    box.innerHTML=`❌ Não foi possível verificar: ${err.message}`
   }
 }
 
-async function openConv(numero) {
-  contatoAtivo = numero
-  document.getElementById('conv-title').textContent = `Conversa — ${numero}`
-  document.getElementById('btn-clear-conv').style.display = 'inline-flex'
-  const box = document.getElementById('chat-conv')
-  box.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando mensagens...</div>'
-  try {
-    const msgs = await req(`/admin/conversas/${lojaAtiva.id}/${numero}`)
-    if (!msgs.length) { box.innerHTML = '<div class="empty"><div class="empty-title">Nenhuma mensagem</div></div>'; return }
-    box.innerHTML = msgs.map(m => `
-      <div class="bubble ${m.role}">
-        <div class="bubble-who">${m.role === 'user' ? '👤 Cliente' : '🤖 Agente'}</div>
-        ${esc(m.content)}
-      </div>`).join('')
-    box.scrollTop = box.scrollHeight
-  } catch(e) { box.innerHTML = `<div class="loading-row" style="color:var(--red-600)">Erro: ${e.message}</div>` }
+async function doConnect(){
+  const num=document.getElementById('conn-num').value.replace(/\D/g,'')
+  if(!num){toast('Informe o número','error');return}
+  const btn=document.getElementById('btn-connect')
+  const msg=document.getElementById('conn-msg')
+  btn.disabled=true;btn.textContent='Aguardando código...'
+  msg.textContent='⏳ Conectando... pode levar até 15 segundos.'
+  const pairDiv=document.getElementById('pairing-display')
+  pairDiv.style.display='none'
+  try{
+    const r=await rq('/connect','POST',{numero:num})
+    if(r.status==='pairing_code'){
+      msg.textContent=''
+      document.getElementById('pair-code-val').textContent=r.code
+      pairDiv.style.display='block'
+      document.getElementById('conn-status-box').className='conn-status waiting'
+      document.getElementById('conn-status-box').innerHTML='⏳ Aguardando vinculação — digite o código no WhatsApp'
+      toast('Código gerado! Digite no WhatsApp em até 60s.','success')
+      // Polling para detectar quando conectar
+      let polls=0
+      const iv=setInterval(async()=>{
+        polls++
+        const s=await rq('/connect-status').catch(()=>null)
+        if(s?.status==='conectado'){
+          clearInterval(iv)
+          pairDiv.style.display='none'
+          document.getElementById('conn-status-box').className='conn-status connected'
+          document.getElementById('conn-status-box').innerHTML=`✅ Conectado — ${s.numero}`
+          toast('WhatsApp conectado com sucesso!','success')
+          pollStatus()
+        }
+        if(polls>30) clearInterval(iv)
+      },3000)
+    }else if(r.status==='ja_conectado'){
+      document.getElementById('conn-status-box').className='conn-status connected'
+      document.getElementById('conn-status-box').innerHTML=`✅ Já conectado — ${r.numero}`
+      msg.textContent=''
+      toast('WhatsApp já está conectado','success')
+    }else{
+      msg.textContent=`Erro: ${r.erro||JSON.stringify(r)}`
+    }
+  }catch(err){msg.textContent=`Erro: ${err.message}`}
+  finally{btn.disabled=false;btn.textContent='Gerar código de vinculação →'}
 }
 
-async function clearConv() {
-  if (!confirm(`Limpar histórico de ${contatoAtivo}?`)) return
-  try {
-    await req(`/admin/conversas/${lojaAtiva.id}/${contatoAtivo}`, 'DELETE')
-    document.getElementById('chat-conv').innerHTML = '<div class="empty"><div class="empty-title">Histórico apagado</div></div>'
-    await loadContatos()
-    toast('Histórico apagado', 'success')
-  } catch(e) { toast('Erro: ' + e.message, 'error') }
+async function doDisconnect(){
+  if(!confirm('Desconectar e apagar a sessão atual?')) return
+  try{
+    await rq('/disconnect','POST')
+    await checkConnStatus()
+    toast('Sessão encerrada','success')
+  }catch(err){toast('Erro: '+err.message,'error')}
 }
 
-/* ─── TABS ───────────────────────────────────────────────── */
-function switchTab(el, contentId) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none')
-  el.classList.add('active')
-  const c = document.getElementById(contentId)
-  if (c) c.style.display = 'block'
-}
-
-/* ─── UTILS ──────────────────────────────────────────────── */
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')
-}
-function fmtR(v) {
-  return Number(v||0).toFixed(2).replace('.',',')
-}
-function fmtDate(s) {
-  if (!s) return '—'
-  return new Date(s).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
-}
-function parseItens(raw) {
-  if (!raw) return []
-  if (Array.isArray(raw)) return raw
-  try { return JSON.parse(raw) } catch { return [] }
-}
-function toast(msg, type = 'success') {
-  const el = document.getElementById('toast')
-  el.textContent = msg
-  el.className = `show ${type}`
-  clearTimeout(el._t)
-  el._t = setTimeout(() => { el.className = '' }, 3500)
-}
-
-// Fecha modais clicando fora
-document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) { const id = o.id; closeModal(id) } })
-})
+// ── UTILS ────────────────────────────────────────────────────────────────────
+function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function fR(v){return Number(v||0).toFixed(2).replace('.',',')}
+function fD(s){if(!s)return'—';return new Date(s).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function piItens(raw){if(!raw)return[];if(Array.isArray(raw))return raw;try{return JSON.parse(raw)}catch{return[]}}
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className=`show ${type}`;clearTimeout(el._t);el._t=setTimeout(()=>{el.className=''},3500)}
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',ev=>{if(ev.target===o)closeMo(o.id)}))
 </script>
 </body>
 </html>
