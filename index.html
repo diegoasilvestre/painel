@@ -521,24 +521,44 @@ async function doLogout() {
 
 // ── HTTP helper — assinatura correta: rq(path, method, body) ─────────────────
 async function rq(path, method, body) {
-  method = method || 'GET'
-  const token = localStorage.getItem('token')
+  method = method || 'GET';
+  const token = localStorage.getItem('token');
+  
+  // 1. Limpeza de URL para evitar as barras duplas (Ex: //admin)
+  const baseUrl = (typeof API !== 'undefined' && API) ? API.replace(/\/$/, '') : '';
+  const cleanPath = path.replace(/^\//, '');
+  const urlFinal = `${baseUrl}/${cleanPath}`;
+
   const opts = {
     method: method,
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json'
     }
-  }
-  if (token) opts.headers['Authorization'] = 'Bearer ' + token
-  if (body)  opts.body = JSON.stringify(body)
+  };
 
-  const res = await fetch(API + path, opts)
-  if (!res.ok) {
-    const err = await res.text()
-    console.error('[' + method + '] ' + path + ' → ' + res.status + ':', err)
-    throw new Error(err)
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body)  opts.body = JSON.stringify(body);
+
+  try {
+    const res = await fetch(urlFinal, opts);
+
+    if (!res.ok) {
+      // Tenta ler a mensagem de erro da API, se houver
+      const errorData = await res.json().catch(() => ({}));
+      const msg = errorData.message || errorData.error || `Erro ${res.status}`;
+      throw new Error(msg);
+    }
+
+    return await res.json();
+  } catch (err) {
+    // Tratamento específico para o erro do seu print
+    if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+      console.error('⚠️ Bloqueio de Conexão: Verifique se o CORS está ativo na API ou se a URL está correta.');
+      throw new Error('Falha na conexão com a API. Verifique o CORS ou a URL.');
+    }
+    throw err;
   }
-  return res.json()
 }
 
 // ── Status WhatsApp ──────────────────────────────────────────────────────────
