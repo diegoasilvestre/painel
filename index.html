@@ -487,23 +487,59 @@ async function doLogin(){
     return
   }
 
+  // salva token
+  localStorage.setItem('token', data.session.access_token)
   TOKEN = data.session.access_token
 
+  // salva API
   API = document.getElementById('i-url').value.trim().replace(/\/$/,'')
 
+  // troca tela
   document.getElementById('sl').style.display='none'
   document.getElementById('sa').style.display='block'
 
+  // carrega dados
   await loadLojas()
 }
-function doLogout(){API=SECRET='';lojaAtiva=null;document.getElementById('sa').style.display='none';document.getElementById('sl').style.display='flex'}
 
-async function rq(path,method='GET',body=null){
-  const opts={method,headers:{'Content-Type':'application/json','Authorization': 'Bearer ' + TOKEN}}
-  if(body) opts.body=JSON.stringify(body)
-  const r=await fetch(API+path,opts)
-  if(!r.ok) throw new Error(await r.text())
-  return r.json()
+async function doLogout(){
+  API = ''
+  lojaAtiva = null
+
+  // remove token
+  localStorage.removeItem('token')
+
+  // logout supabase
+  try {
+    await supabaseClient.auth.signOut()
+  } catch(e){
+    console.warn(e.message)
+  }
+
+  // volta tela login
+  document.getElementById('sa').style.display='none'
+  document.getElementById('sl').style.display='flex'
+}
+
+async function rq(url, opt = {}) {
+  const token = localStorage.getItem('token')
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: 'Bearer ' + token })
+  }
+
+  const res = await fetch(API + url, {
+    ...opt,
+    headers
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err)
+  }
+
+  return res.json()
 }
 
 async function pollStatus(){
