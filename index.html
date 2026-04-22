@@ -519,23 +519,25 @@ async function doLogout(){
   document.getElementById('sl').style.display='flex'
 }
 
-async function rq(url, opt = {}) {
+async function rq(path, method = 'GET', body = null) {
   const token = localStorage.getItem('token')
-
-  // 🔍 DEBUG AQUI
-  console.log('API:', API)
-  console.log('URL FINAL:', API + url)
-  console.log('TOKEN:', token)
-
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: 'Bearer ' + token })
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: 'Bearer ' + token })
+    }
   }
+  if (body) opts.body = JSON.stringify(body)
 
-  const res = await fetch(API + url, {
-    ...opt,
-    headers
-  })
+  const res = await fetch(API + path, opts)
+  if (!res.ok) {
+    const err = await res.text()
+    console.error('ERRO BACKEND:', res.status, err)
+    throw new Error(err)
+  }
+  return res.json()
+}
 
   if (!res.ok) {
     const err = await res.text()
@@ -687,8 +689,8 @@ async function doTest(){
   box.innerHTML+=`<div class="bub assistant" id="bt"><div class="bw">🤖 Agente</div><span style="opacity:.5">digitando...</span></div>`
   box.scrollTop=box.scrollHeight
   try{
-    const r=await fetch(`${API}/simulate`,{method:'POST',headers:{'Content-Type':'application/json','Authorization': 'Bearer ' + TOKEN},body:JSON.stringify({phone:'99900000001',text:msg,loja_id:lojaAtiva.id})})
-    const d=await r.json()
+    // usa rq corrigida — não TOKEN diretamente
+    const d = await rq('/simulate','POST',{phone:'99900000001',text:msg,loja_id:lojaAtiva.id})
     const b=document.getElementById('bt')
     if(b) b.innerHTML=`<div class="bw">🤖 Agente</div>${e(d.reply||d.resposta||d.erro||'Sem resposta')}`
     box.scrollTop=box.scrollHeight
